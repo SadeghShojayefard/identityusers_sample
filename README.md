@@ -74,6 +74,14 @@ The goal is to give developers:
 This avoids guesswork and speeds up integration.
 
 ---
+## 📄 Documentation
+
+A detailed PDF guide is included in this repository:
+
+**[📘 Click here to download the full IdentityUser Documentation](https://github.com/SadeghShojayefard/identityusers_sample/blob/main/IdentityUser_Documentation.pdf)**
+
+(Contains full explanations, examples, and setup instructions.)
+
 
 ## ✨ Author
 
