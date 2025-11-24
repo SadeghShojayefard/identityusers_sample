@@ -50,8 +50,7 @@ npm run dev
   [https://www.npmjs.com/package/identityuser](https://www.npmjs.com/package/identityuser)
 
 * **IdentityUser Core Repository (GitHub):**
-   [https://github.com/SadeghShojayefard/identityuser](https://www.npmjs.com/package/identityuser](https://github.com/SadeghShojayefard/identityuser)
-
+[https://www.npmjs.com/package/identityuser](https://www.npmjs.com/package/identityuser)
 ---
 
 ## 🛠 Technologies Used
