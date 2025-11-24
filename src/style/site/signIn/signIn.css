@@ -1,0 +1,30 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+#canvas {
+    @apply absolute top-0 left-0 w-full h-full z-10
+}
+
+.formBody {
+    @apply p-10 flex items-center justify-start text-black z-10 shadow-xl shadow-black
+}
+
+.form-style {
+    @apply text-start w-full
+}
+
+.form-title {
+    @apply text-3xl font-bold
+}
+
+.form-group {
+    @apply mt-6 w-full
+}
+
+.input-group {
+    @apply mb-4 w-full
+}
+
+.input-style {
+    @apply w-full p-2 mt-1 border-b border-black focus:border-b-3 focus:border-green-500 outline-0 shadow-black shadow-md focus:bg-white/20 focus:backdrop-blur-2xl
+}

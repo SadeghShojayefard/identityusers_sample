@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# IdentityUser Test Project
 
-## Getting Started
+This repository is a **demo and testing environment** for the `identityuser` NPM package.
+Its main purpose is to help developers understand how the package works and to provide a ready-to-use example for integration and testing.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 📌 Purpose of This Project
+
+The Test Project demonstrates:
+
+* How to install and configure the `identityuser` package
+* How to call the API functions
+* How the package behaves in real scenarios
+* How avatar generation, identity assignment, and other utilities work
+* A clear, practical usage example for other developers
+
+---
+
+## 📄 Documentation
+
+A detailed PDF guide is included in this repository:
+
+**`/docs/IdentityUser-Guide.pdf`**
+(Contains full explanations, examples, and setup instructions.)
+
+---
+
+## 🚀 How to Use the Test Project
+
+1. Install dependencies:
+
+```
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Run the development server:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Explore the example pages and test how the package features work.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🔗 Related Repositories
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+* IdentityUser NPM Package:
+  [https://www.npmjs.com/package/identityuser](https://www.npmjs.com/package/identityuser)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+* **IdentityUser Core Repository (GitHub):**
+  (Add link here after you upload it)
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 🛠 Technologies Used
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+* Next.js (Test Environment)
+* Node.js / NPM
+* identityuser package
+* JavaScript/TypeScript
+
+---
+
+## 🧩 Why This Repository Exists?
+
+The goal is to give developers:
+
+* A plug-and-play demo
+* A real implementation reference
+* A place to test functions before using the package in their own projects
+
+This avoids guesswork and speeds up integration.
+
+---
+
+## ✨ Author
+
+Created with ❤️ for developers who need a clean and simple identity helper utility.
+
+---
+---
+
+## 📞 Contact
+
+<div align="center">
+
+[![Website](https://img.shields.io/badge/Website-sadegh--shojayefard.vercel.app-4285F4?style=flat\&logo=google-chrome\&logoColor=white)](https://sadegh-shojayee-fard.vercel.app/)
+[![Gmail](https://img.shields.io/badge/Gmail-sadegh.shojayefar@gmail.com-D14836?style=flat\&logo=gmail\&logoColor=white)](mailto:sadegh.shojayefar@gmail.com)
+[![Telegram](https://img.shields.io/badge/telegram-@link__lover1-4285F4?style=flat\&logo=telegram)](https://t.me/link_lover1)
+
+</div>
+
+---

@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+.menu_a_tag {
+    @apply relative flex w-full justify-between items-center;
+
+}
+
+.menu_hover_animate {
+    @apply absolute bottom-0 left-0 w-0 border-b-4 border-cyan-500 transition-all duration-300 group-hover:w-full -my-1;
+}
+
+
+.active-menu {
+    @apply flex flex-row w-full justify-between items-center border-b-4 border-cyan-500
+}
