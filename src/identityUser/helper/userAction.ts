@@ -10,7 +10,6 @@ import IdentityUser_UserRoles from "@/identityUser/lib/models/identityUser_userR
 import "@/identityUser/lib/models/identityUser_roles";
 import IdentityUser_Roles from "@/identityUser/lib/models/identityUser_roles";
 import IdentityUser_Claims from "@/identityUser/lib/models/identityUser_claims";
-import IdentityUser_RoleClaim from "@/identityUser/lib/models/identityUser_roleClaims";
 
 import { usersAddSchema } from "@/identityUser/validation/usersAddValidation";
 import { randomUUID } from "crypto";
@@ -20,18 +19,21 @@ import { usersEditSchema } from "@/identityUser/validation/usersEditValidation";
 import { changeNameSchema } from "@/identityUser/validation/changeNameValidation";
 import { changePasswordSchema } from "@/identityUser/validation/changePassword";
 import { hasAnyClaim, hasClaim } from "@/identityUser/lib/session";
+import { changeUserNameSchema } from "../validation/changeUserNameValidation";
+import { changeEmailSchema } from "../validation/changeEmailValidationy";
+import identityUser_roleClaims from "../lib/models/identityUser_roleClaims";
 
 
 
 export async function AddUserAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("add-user"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("add-user"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
         schema: usersAddSchema(),
     });
@@ -51,19 +53,19 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
     try {
         await dbConnect();
 
-        const usernameResult = await checkUserNameExistAction(username);
+        const usernameResult = await checkUserExistByUserNameAction(username);
         if (usernameResult.status === "success") {
             return subMission.reply({
                 fieldErrors: {
-                    shortName: ["username or password already exist7"],
+                    username: ["username already exist"],
                 },
             });
         }
-        const emailResult = await checkUserNameExistAction(email);
+        const emailResult = await checkUserExistByEmailAction(email);
         if (emailResult.status === "success") {
             return subMission.reply({
                 fieldErrors: {
-                    shortName: ["username or password already exist7"],
+                    email: ["email already exist"],
                 },
             });
         }
@@ -123,14 +125,14 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
 
 
 export async function UserUpdateAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("edit-user"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("edit-user"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const submission = parseWithZod(formData, {
         schema: usersEditSchema(),
     });
@@ -178,8 +180,8 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
         // 3) Check if the new username and email already exist or not.
 
 
-        if (username !== existingUser.userName) {
-            const usernameExists = await checkUserNameExistAction(existingUser.id);
+        if (username.toUpperCase().trim() !== existingUser.normalizedUserName) {
+            const usernameExists = await checkUserExistByUserNameAction(username);
             if (usernameExists.status === "success") {
                 return {
                     status: "error",
@@ -188,8 +190,8 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
             }
         }
 
-        if (email !== existingUser.email) {
-            const emailExists = await checkEmailExistAction(existingUser.email);
+        if (email.toUpperCase().trim() !== existingUser.normalizedEmail) {
+            const emailExists = await checkUserExistByEmailAction(email);
             if (emailExists.status === "success") {
                 return {
                     status: "error",
@@ -197,6 +199,17 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
                 } as const;
             }
         }
+
+        /// user this if only you want have uniq phoneNumber
+        // if (phoneNumber !== existingUser.phoneNumber) {
+        //     const emailExists = await checkUserExistByPhoneNumberAction(phoneNumber);
+        //     if (emailExists.status === "success") {
+        //         return {
+        //             status: "error",
+        //             payload: { message: "Email already exists." },
+        //         } as const;
+        //     }
+        // }
 
         //  Auxiliary variable for detecting important changes
         let sensitiveChanged = false;
@@ -295,14 +308,14 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
 }
 
 export async function deleteUserAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("delete-User"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("delete-User"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
         schema: deleteSchema(),
     });
@@ -349,15 +362,15 @@ export async function deleteUserAction(prevState: unknown, formData: FormData) {
     }
 }
 
-export async function changePasswordAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("change-password-user"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+export async function resetPasswordAction(prevState: unknown, formData: FormData) {
+    // if (!(await hasClaim("change-password-user"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
 
     const subMission = parseWithZod(formData, {
         schema: ChangePasswordUserShema(),
@@ -410,7 +423,89 @@ export async function changePasswordAction(prevState: unknown, formData: FormDat
         } as const;
     }
 }
+export async function changePasswordAction(prevState: unknown, formData: FormData) {
+    if (!(await hasAnyClaim())) {
+        return {
+            status: 'error',
+            payload: {
+                message: 'no access for this action',
+            },
+        } as const;
+    }
+    const subMission = parseWithZod(formData, {
+        schema: changePasswordSchema(),
+    });
 
+    if (subMission.status !== "success") {
+        return subMission.reply();
+    }
+
+    try {
+        await dbConnect();
+        const {
+            username,
+            currentPassword,
+            newPassword,
+            newPassword2
+        } = subMission.value;
+        const existingUser = await IdentityUser_Users.findOne({ username: username.trim() });
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        const currentPasswordResult = await comparePassword(currentPassword, existingUser.passwordHash);
+        if (!currentPasswordResult) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "oldPassword",
+                },
+            } as const;
+        }
+
+        if (newPassword !== newPassword2) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "not match",
+                },
+            } as const;
+        }
+
+        const encryptPassword = await hashPassword(newPassword);
+
+        await IdentityUser_Users.findByIdAndUpdate(
+            existingUser._id,
+            {
+                $set: {
+                    passwordHash: encryptPassword,
+                    securityStamp: randomUUID(),
+                }
+            },
+        ).exec();
+
+        return {
+            status: "success",
+            payload: {
+                message: "",
+            },
+        } as const;
+    }
+    catch (error) {
+        console.error('Error saving contact form:', error);
+        return {
+            status: 'error',
+            payload: {
+                message: '',
+            },
+        } as const;
+    }
+}
 
 export async function getAllUsersAction() {
     try {
@@ -538,54 +633,50 @@ export async function getUserByIdAction(userId: string) {
     // 1) Find User By Id
     const user = await IdentityUser_Users.findById(userId);
     if (!user) {
-        return { status: "error", message: "User not found" };
+        return {
+            status: "error",
+            payload: {
+                message: "User not found",
+            }
+        }
     }
-
-    // 2) FinD User Roles
-    const userRoles = await IdentityUser_UserRoles.find({ user: userId })
-        .populate({
-            path: "role",
-            model: IdentityUser_Roles,
-            select: "name ",
-        })
-        .lean();
-
-    // 3) Find User Direct Claim
-    const userClaims = await IdentityUser_UserClaims.find({ user: userId })
-        .populate({
-            path: "claim",
-            model: IdentityUser_Claims,
-            select: "  description",
-        })
-        .lean();
-
-    // 4) Creating the final output
-
-    return {
-        status: 'error',
-        payload: {
-            id: userId.toString(),
-            userName: user.username,
-            name: user.name,
-            email: user.email,
-            emailConfirmed: user.emailConfirmed,
-            concurrencyStamp: user.concurrencyStamp.toString(),
-            phoneNumber: user.phoneNumber,
-            phoneNumberConfirmed: user.phoneNumberConfirmed,
-            accessFailedCount: user.accessFailedCount,
-            roles: userRoles.map((r) => ({
-                roleId: r.role._id.toString(),
-                roleName: r.role.name
-            })),
-            claims: userClaims.map((c) => ({
-                claimID: c.claim._id.toString(),
-                claimDescription: c.claim.description
-            })),
-        },
-    } as const;
+    return await getUserDataSharedFunction(user);
 }
 
 export async function getUserByUsernameAction(username: string) {
+    await dbConnect();
+
+    // 1) Find User by Username
+    const user = await IdentityUser_Users.findOne({ normalizedUserName: username.toUpperCase().trim() });
+    if (!user) {
+        return {
+            status: "error",
+            payload: {
+                message: "User not found",
+            }
+        }
+    }
+
+    return await getUserDataSharedFunction(user);
+}
+export async function getUserByEmailAction(email: string) {
+    await dbConnect();
+    // 1) Find User by Email
+    const user = await IdentityUser_Users.findOne({ normalizedEmail: email.toUpperCase().trim() });
+
+    if (!user) {
+        return {
+            status: "error",
+            payload: {
+                message: "User not found",
+            }
+        }
+    }
+
+    return await getUserDataSharedFunction(user);
+}
+
+export async function getUserByUsernameForSessionAction(username: string) {
     await dbConnect();
 
     // 1) Find User by Username
@@ -620,7 +711,7 @@ export async function getUserByUsernameAction(username: string) {
     const directClaimNames = directClaims.map(c => c.claim.claimValue);
 
     // 4)  Find User Roles Claims
-    const roleClaims = await IdentityUser_RoleClaim.find({
+    const roleClaims = await identityUser_roleClaims.find({
         role: { $in: roleIds },
     })
         .populate({
@@ -653,17 +744,83 @@ export async function getUserByUsernameAction(username: string) {
         }
     } as const;
 }
+export async function getUserByPhoneNumberAction(phoneNumber: string) {
+    await dbConnect();
+    // use this action only when use phoneNumber as uniq field for each user
+    // 1) Find User by phoneNumber
+    const user = await IdentityUser_Users.findOne({ phoneNumber: phoneNumber.trim() });
+
+    if (!user) {
+        return {
+            status: "error",
+            payload: {
+                message: "User not found",
+            }
+        }
+    }
+
+    return await getUserDataSharedFunction(user);
+}
+
+
+async function getUserDataSharedFunction(user: any) {
+    // 2) Find User Roles
+    const userRoles = await IdentityUser_UserRoles.find({ user: user._id })
+        .populate({
+            path: "role",
+            model: IdentityUser_Roles,
+            select: "name ",
+        })
+        .lean();
+
+    // 3) Find User Direct Claim
+    const userClaims = await IdentityUser_UserClaims.find({ user: user._id })
+        .populate({
+            path: "claim",
+            model: IdentityUser_Claims,
+            select: "  description",
+        })
+        .lean();
+
+    // 4) Creating the final output
+
+    return {
+        status: 'success',
+        payload: {
+            id: user._id.toString(),
+            username: user.username,
+            name: user.name,
+            email: user.email,
+            emailConfirmed: user.emailConfirmed,
+            concurrencyStamp: user.concurrencyStamp.toString(),
+            phoneNumber: user.phoneNumber,
+            phoneNumberConfirmed: user.phoneNumberConfirmed,
+            accessFailedCount: user.accessFailedCount,
+            avatar: user.avatar,
+            securityStamp: user.securityStamp,
+            password: user.passwordHash,
+            roles: userRoles.map((r) => ({
+                roleId: r.role._id.toString(),
+                roleName: r.role.name
+            })),
+            claims: userClaims.map((c) => ({
+                claimID: c.claim._id.toString(),
+                claimDescription: c.claim.description
+            })),
+        },
+    } as const;
+}
 
 export async function changeNameAction(prevState: unknown, formData: FormData) {
 
-    if (!(await hasAnyClaim())) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
         schema: changeNameSchema(),
     });
@@ -729,17 +886,18 @@ export async function changeNameAction(prevState: unknown, formData: FormData) {
     }
 }
 
-export async function changePasswordProfileAction(prevState: unknown, formData: FormData) {
-    if (!(await hasAnyClaim())) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+export async function changeUserNameAction(prevState: unknown, formData: FormData) {
+
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
-        schema: changePasswordSchema(),
+        schema: changeUserNameSchema(),
     });
 
     if (subMission.status !== "success") {
@@ -749,12 +907,11 @@ export async function changePasswordProfileAction(prevState: unknown, formData: 
     try {
         await dbConnect();
         const {
-            username,
-            currentPassword,
-            newPassword,
-            newPassword2
+            id,
+            newUserName,
         } = subMission.value;
-        const existingUser = await IdentityUser_Users.findOne({ username: username.trim() });
+
+        const existingUser = await IdentityUser_Users.findById(id);
         if (!existingUser) {
             return {
                 status: 'error',
@@ -764,73 +921,129 @@ export async function changePasswordProfileAction(prevState: unknown, formData: 
             } as const;
         }
 
-        const currentPasswordResult = await comparePassword(currentPassword, existingUser.passwordHash);
-        if (!currentPasswordResult) {
-            return {
-                status: 'error',
-                payload: {
-                    message: "oldPassword",
+        if (newUserName.toUpperCase().trim() !== existingUser.normalizedUserName) {
+            const usernameExists = await checkUserExistByUserNameAction(newUserName.trim());
+            if (usernameExists.status === "success") {
+                return {
+                    status: "error",
+                    payload: { message: "Username already exists." },
+                } as const;
+            }
+            await IdentityUser_Users.findByIdAndUpdate(
+                existingUser._id,
+                {
+                    $set: {
+                        username: newUserName.trim(),
+                        normalizedUserName: newUserName.toUpperCase().trim(),
+                        securityStamp: randomUUID(),
+                    }
                 },
-            } as const;
+            ).exec();
         }
-
-        if (newPassword !== newPassword2) {
-            return {
-                status: 'error',
-                payload: {
-                    message: "not match",
-                },
-            } as const;
-        }
-
-        const encryptPassword = await hashPassword(newPassword);
-
-        await IdentityUser_Users.findByIdAndUpdate(
-            existingUser._id,
-            {
-                $set: {
-                    passwordHash: encryptPassword,
-                    securityStamp: randomUUID(),
-                }
-            },
-        ).exec();
 
         return {
             status: "success",
+            payload: {
+                username: newUserName.trim(),
+            },
+        } as const;
+
+
+
+    }
+    catch (error) {
+        return {
+            status: 'error',
             payload: {
                 message: "",
             },
         } as const;
     }
+}
+
+export async function changeEmailAction(prevState: unknown, formData: FormData) {
+
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
+    const subMission = parseWithZod(formData, {
+        schema: changeEmailSchema(),
+    });
+
+    if (subMission.status !== "success") {
+        return subMission.reply();
+    }
+
+    try {
+        await dbConnect();
+        const {
+            id,
+            newEmail,
+        } = subMission.value;
+
+        const existingUser = await IdentityUser_Users.findById(id);
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        if (newEmail.toUpperCase().trim() !== existingUser.normalizedEmail) {
+            const emailExists = await checkUserExistByEmailAction(newEmail);
+            if (emailExists.status === "success") {
+                return {
+                    status: "error",
+                    payload: { message: "Email already exists." },
+                } as const;
+            }
+            await IdentityUser_Users.findByIdAndUpdate(
+                existingUser._id,
+                {
+                    $set: {
+                        email: newEmail.trim(),
+                        normalizedEmail: newEmail.toUpperCase().trim(),
+                        emailConfirmed: false,
+                        securityStamp: randomUUID(),
+                    }
+                },
+            ).exec();
+        }
+
+
+        return {
+            status: "success",
+            payload: {
+                newEmail: newEmail.trim(),
+            },
+        } as const;
+
+
+
+    }
     catch (error) {
-        console.error('Error saving contact form:', error);
         return {
             status: 'error',
             payload: {
-                message: '',
+                message: "",
             },
         } as const;
     }
 }
 
-export async function checkUserNameExistAction(username: string) {
+
+export async function checkUserExistByUserNameAction(username: string) {
     await dbConnect();
     try {
         const existingUser = await IdentityUser_Users.findOne({ normalizedUserName: username.toUpperCase().trim() });
-        if (existingUser) {
-            return {
-                status: 'success',
-                data: {
-                    id: existingUser._id.toString(),
-                }
-            };
-        }
-        return {
-            status: 'error',
-            data: {
-                id: null,
-            }
-        };
+        return checkUserExistResult(existingUser);
 
     } catch (error) {
         return {
@@ -842,29 +1055,67 @@ export async function checkUserNameExistAction(username: string) {
     }
 }
 
-export async function checkEmailExistAction(email: string) {
+export async function checkUserExistByIdAction(Id: string) {
     await dbConnect();
     try {
-        const existingUser = await IdentityUser_Users.findOne({ normalizedEmail: email.toUpperCase().trim() });
-        if (existingUser) {
-            return {
-                status: 'success',
-                data: {
-                    id: existingUser._id.toString(),
-                }
-            };
-        }
+        const existingUser = await IdentityUser_Users.findOne({ _id: Id.trim() });
+        return checkUserExistResult(existingUser);
+
+    } catch (error) {
         return {
             status: 'error',
             data: {
                 id: null,
             }
         };
+    }
+}
+
+export async function checkUserExistByPhoneNumberAction(phoneNumber: string) {
+
+    // use this action only when use phoneNumber as uniq field for each user
+    await dbConnect();
+    try {
+        const existingUser = await IdentityUser_Users.findOne({ phoneNumber: phoneNumber.trim() });
+        return checkUserExistResult(existingUser);
+    } catch (error) {
+        return {
+            status: 'error',
+            data: {
+                id: null,
+            }
+        };
+    }
+}
+
+export async function checkUserExistByEmailAction(email: string) {
+    await dbConnect();
+    try {
+        const existingUser = await IdentityUser_Users.findOne({ normalizedEmail: email.toUpperCase().trim() });
+        return checkUserExistResult(existingUser);
     } catch (error) {
         return {
             status: 'error',
         };
     }
+}
+
+function checkUserExistResult(existingUser: any) {
+    // use this action only when use phoneNumber as uniq field for each user
+    if (existingUser) {
+        return {
+            status: 'success',
+            data: {
+                id: existingUser._id.toString(),
+            }
+        };
+    }
+    return {
+        status: 'error',
+        data: {
+            id: null,
+        }
+    };
 }
 
 export async function getCurrentCCSAction(username: string) {
@@ -895,4 +1146,120 @@ export async function getCurrentCCSAction(username: string) {
         };
     }
 }
+
+export async function LockUnlockUserAction(userId: string) {
+
+    try {
+        await dbConnect();
+
+        const existingUser = await checkUserExistByIdAction(userId);
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        const user = await IdentityUser_Users.findById(userId);
+        let lock = false;
+
+        if (user.lockoutEnabled === true) {
+            await IdentityUser_Users.findByIdAndUpdate(
+                userId,
+                {
+
+                    $set: {
+
+                        lockoutEnd: false,
+                        lockoutEnabled: null,
+                        accessFailedCount: 0,
+                        securityStamp: randomUUID(),
+                    }
+                },
+            ).exec();
+        }
+        else {
+            await IdentityUser_Users.findByIdAndUpdate(
+                userId,
+                {
+
+                    $set: {
+
+                        lockoutEnd: true,
+                        lockoutEnabled: new Date(8640000000000000),
+                        accessFailedCount: 5,
+                        securityStamp: randomUUID(),
+                    }
+                },
+            ).exec();
+            lock = true;
+        }
+
+        return {
+            status: "success",
+            payload: {
+                lockoutEnd: lock
+            },
+        } as const;
+
+
+    }
+    catch (error) {
+        return {
+            status: 'error',
+            payload: {
+                message: "",
+            },
+        } as const;
+    }
+}
+
+export async function resetSecurityStampAction(userId: string) {
+
+    try {
+        await dbConnect();
+
+        const existingUser = await checkUserExistByIdAction(userId);
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        await IdentityUser_Users.findByIdAndUpdate(
+            userId,
+            {
+
+                $set: {
+                    securityStamp: randomUUID(),
+                }
+            },
+        ).exec();
+
+
+        return {
+            status: "success",
+            payload: {
+                ssage: "Security Stamp reset Successfully",
+            },
+        } as const;
+
+
+    }
+    catch (error) {
+        return {
+            status: 'error',
+            payload: {
+                message: "",
+            },
+        } as const;
+    }
+}
+
+
 

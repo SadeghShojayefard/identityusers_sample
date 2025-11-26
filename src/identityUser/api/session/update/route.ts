@@ -1,8 +1,9 @@
+// File: src/app/api/session/update/route.ts
 import { getServerSession } from 'next-auth';
 import { options } from '@/identityUser/api/auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/identityUser/lib/db';
-import { getUserByUsernameAction } from '@/identityUser/helper/userAction';
+import { getUserByUsernameAction, getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
 
 export async function GET() {
     try {
@@ -14,7 +15,7 @@ export async function GET() {
         }
 
         // const user = await Users.findOne({ username: session.user.username }).populate('role', 'titleEN');
-        const user = await getUserByUsernameAction(session.user.username);
+        const user = await getUserByUsernameForSessionAction(session.user.username);
         if (!user) {
             return NextResponse.json({ status: 'notFound' }, { status: 404 });
         }

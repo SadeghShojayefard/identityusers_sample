@@ -1,8 +1,5 @@
-import { options } from "@/identityUser/api/auth/[...nextauth]/options";
 import NextAuth from "next-auth";
+import { options } from "@/identityUser/api/auth/[...nextauth]/options";
 
-const handler = NextAuth(options);
-export { handler as GET, handler as POST };
-
-
-
+export const GET = NextAuth(options);
+export const POST = NextAuth(options);

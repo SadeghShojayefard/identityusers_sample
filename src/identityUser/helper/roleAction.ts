@@ -15,14 +15,14 @@ import { userRoleUpdateSchema } from "@/identityUser/validation/userRoleUpdateVa
 import { hasClaim } from "@/identityUser/lib/session";
 
 export async function roleAddAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("add-roles"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("add-roles"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
 
     const subMission = parseWithZod(formData, {
         schema: userRoleSchema(),
@@ -77,14 +77,14 @@ export async function roleAddAction(prevState: unknown, formData: FormData) {
 }
 
 export async function roleUpdateAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("edit-roles"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("it-roles"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const submission = parseWithZod(formData, {
         schema: userRoleUpdateSchema(),
     });
@@ -185,14 +185,14 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
 }
 
 export async function deleteRoleAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("delete-roles"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("delete-roles"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
         schema: deleteSchema(),
     });

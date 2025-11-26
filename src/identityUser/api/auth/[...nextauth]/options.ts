@@ -3,7 +3,7 @@ import type { NextAuthOptions } from 'next-auth';
 import IdentityUser_Users from '@/identityUser/lib/models/identityUser_users';
 import { comparePassword } from '@/identityUser/helper/sharedFunction';
 import dbConnect from '@/identityUser/lib/db';
-import { getUserByUsernameAction } from '@/identityUser/helper/userAction';
+import { getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
 
 export const options: NextAuthOptions = {
     session: {
@@ -21,7 +21,7 @@ export const options: NextAuthOptions = {
                 const { username, password } = credentials;
 
                 await dbConnect();
-                const user = await getUserByUsernameAction(username);
+                const user = await getUserByUsernameForSessionAction(username);
 
                 if (!user) return null;
                 const userData = user.payload;
@@ -87,7 +87,7 @@ export const options: NextAuthOptions = {
                 await dbConnect();
 
                 //Read new user information from the database
-                const freshUser = (await getUserByUsernameAction(token.username)).payload;
+                const freshUser = (await getUserByUsernameForSessionAction(token.username)).payload;
 
                 if (freshUser) {
                     token.roles = freshUser.roles;
@@ -124,7 +124,7 @@ export const options: NextAuthOptions = {
                 };
             }
 
-            const freshUser = (await getUserByUsernameAction(user.username)).payload;
+            const freshUser = (await getUserByUsernameForSessionAction(user.username)).payload;
 
             // ------------------------------------------
             // Compare roles

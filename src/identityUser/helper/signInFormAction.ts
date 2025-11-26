@@ -3,7 +3,7 @@ import dbConnect from "@/identityUser/lib/db";
 import { SignInSchema } from "@/identityUser/validation/signInValidation";
 import { parseWithZod } from "@conform-to/zod";
 import IdentityUser_Users from "@/identityUser/lib/models/identityUser_users";
-import { checkUserNameExistAction } from "./userAction";
+import { checkUserExistByUserNameAction } from "./userAction";
 
 export async function signInFormAction(prevState: unknown, formData: FormData) {
 
@@ -31,7 +31,7 @@ export async function canUserSignInAction(username: string) {
 
     try {
         await dbConnect();
-        const usernameResult = await checkUserNameExistAction(username);
+        const usernameResult = await checkUserExistByUserNameAction(username);
 
         if (usernameResult.status === "success") {
 
@@ -83,7 +83,7 @@ export async function canUserSignInAction(username: string) {
 export async function signInFailedAction(username: string) {
     try {
         await dbConnect();
-        const usernameResult = await checkUserNameExistAction(username);
+        const usernameResult = await checkUserExistByUserNameAction(username);
 
         if (usernameResult.status === "success") {
 
@@ -133,7 +133,7 @@ export async function signInFailedAction(username: string) {
 export async function signInSuccessAction(username: string) {
     try {
         await dbConnect();
-        const usernameResult = await checkUserNameExistAction(username);
+        const usernameResult = await checkUserExistByUserNameAction(username);
 
         if (usernameResult.status === "success") {
 

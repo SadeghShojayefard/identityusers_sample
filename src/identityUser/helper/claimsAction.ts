@@ -17,14 +17,14 @@ import { hasClaim } from "@/identityUser/lib/session";
 
 
 export async function addClaimAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("add-Claims"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("add-Claims"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
 
 
     const subMission = parseWithZod(formData, {
@@ -92,14 +92,14 @@ export async function getClaimsAction() {
 }
 
 export async function deleteClaimsAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("delete-Claims"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("delete-Claims"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
 
     // 1) Validate
     const subMission = parseWithZod(formData, {
@@ -181,14 +181,14 @@ export async function deleteClaimsAction(prevState: unknown, formData: FormData)
 
 
 export async function updateClaimsAction(prevState: unknown, formData: FormData) {
-    if (!(await hasClaim("edit-Claims"))) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasClaim("edit-Claims"))) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const submission = parseWithZod(formData, {
         schema: updateClaimsSchema(),
     });

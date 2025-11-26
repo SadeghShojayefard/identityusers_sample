@@ -3,7 +3,7 @@ import dbConnect from "@/identityUser/lib/db";
 import { signUpSchema } from "@/identityUser/validation/signUpValidation";
 import { parseWithZod } from "@conform-to/zod";
 import { revalidatePath } from "next/cache";
-import { checkEmailExistAction, checkUserNameExistAction } from "./userAction";
+import { checkUserExistByEmailAction, checkUserExistByUserNameAction } from "./userAction";
 import { hashPassword } from "./sharedFunction";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
@@ -41,7 +41,7 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
             } as const;
         }
 
-        const usernameResult = await checkUserNameExistAction(username);
+        const usernameResult = await checkUserExistByUserNameAction(username);
         if (usernameResult.status === "success") {
             return {
                 status: 'error',
@@ -51,7 +51,7 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
             } as const;
         }
 
-        const emailResult = await checkEmailExistAction(email);
+        const emailResult = await checkUserExistByEmailAction(email);
         if (emailResult.status === "success") {
             return {
                 status: 'error',
