@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth';
 import { options } from '@/identityUser/api/auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/identityUser/lib/db';
-import { getUserByUsernameAction, getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
+import { getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
 
 export async function GET() {
     try {
