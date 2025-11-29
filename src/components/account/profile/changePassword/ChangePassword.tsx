@@ -2,9 +2,8 @@
 import { useCustomForm } from "@/hooks/useCustomForm";
 import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
-import { changePasswordProfileAction } from "@/identityUser/helper/userAction";
-import { changePasswordSchema } from "@/identityUser/validation/changePassword";
-import { hasPayload } from "@/type/actionType.type";
+import { changePasswordAction } from "@/identityuser/helper/userAction";
+import { changePasswordSchema } from "@/identityuser/validation/changePassword";
 
 const ChangePassword: React.FC<{
     username: string;
@@ -14,7 +13,7 @@ const ChangePassword: React.FC<{
     const [oldPasswordError, setOldPasswordError] = useState(false);
 
     const { form, fields, formAction, isPending, toastVisible, lastResult } = useCustomForm({
-        action: changePasswordProfileAction,
+        action: changePasswordAction,
         schema: changePasswordSchema(),
         showToast: true,
         id: "change-password-form"
@@ -22,19 +21,18 @@ const ChangePassword: React.FC<{
 
     useEffect(() => {
         if (lastResult?.status !== 'success') {
-            if (hasPayload(lastResult)) {
-                const message = lastResult.payload?.message;
+            const message = lastResult?.payload?.message;
 
-                if (message === "userNotExist") {
-                    setUsernameError(true);
-                    setOldPasswordError(false);
-                } else if (message === "oldPassword") {
-                    setUsernameError(false);
-                    setOldPasswordError(true);
-                } else if (message === "not match") {
-                    // ...
-                }
+            if (message === "userNotExist") {
+                setUsernameError(true);
+                setOldPasswordError(false);
+            } else if (message === "oldPassword") {
+                setUsernameError(false);
+                setOldPasswordError(true);
+            } else if (message === "not match") {
+                // ...
             }
+
 
         }
         else if (lastResult?.status === 'success') {
@@ -57,7 +55,7 @@ const ChangePassword: React.FC<{
                 <b className="font-bold text-lg text-black text-shadow-xs text-shadow-black text-start w-full"></b>
 
                 <div className="w-full p-10 flex items-center justify-start text-black z-10 shadow-2xl shadow-black  bg-white/10 rounded-2xl ">
-                    <div className="form-style ">
+                    <div className="form-style w-full">
                         <h2 className="form-title">Change Password  </h2>
                         {toastVisible && (
                             <p className=" bg-sky-500 backdrop-blur-2xl text-white px-5 py-2  rounded-lg mt-2

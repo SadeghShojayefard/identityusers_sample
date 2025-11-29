@@ -1,5 +1,5 @@
 import UserRolesTable from "@/components/admin/userRoles/userRolesTable/UserRolesTable";
-import { hasClaim } from "@/identityUser/lib/session";
+import { hasClaim } from "@/identityuser/lib/session";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

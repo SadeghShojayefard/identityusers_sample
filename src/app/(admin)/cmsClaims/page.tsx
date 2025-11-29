@@ -1,6 +1,6 @@
 import ClaimForm from "@/components/admin/claims/claimForm/ClaimForm";
 import ClaimTable from "@/components/admin/claims/claimTable/ClaimTable";
-import { hasClaim } from "@/identityUser/lib/session";
+import { hasClaim } from "@/identityuser/lib/session";
 import { redirect } from "next/navigation";
 
 

@@ -6,11 +6,11 @@
 }
 
 .formBody {
-    @apply p-10 flex items-center justify-start text-black z-10 shadow-xl shadow-black
+    @apply p-10 flex items-center justify-center text-black z-10 shadow-xl shadow-black
 }
 
 .form-style {
-    @apply text-start w-full
+    @apply text-start
 }
 
 .form-title {

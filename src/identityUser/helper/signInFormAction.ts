@@ -1,8 +1,8 @@
 'use server';
-import dbConnect from "@/identityUser/lib/db";
-import { SignInSchema } from "@/identityUser/validation/signInValidation";
+import dbConnect from "@/identityuser/lib/db";
+import { SignInSchema } from "@/identityuser/validation/signInValidation";
 import { parseWithZod } from "@conform-to/zod";
-import IdentityUser_Users from "@/identityUser/lib/models/identityUser_users";
+import identityUser_users from "@/identityuser/lib/models/identityUser_users";
 import { checkUserExistByUserNameAction } from "./userAction";
 
 export async function signInFormAction(prevState: unknown, formData: FormData) {
@@ -35,7 +35,7 @@ export async function canUserSignInAction(username: string) {
 
         if (usernameResult.status === "success") {
 
-            const userData = await IdentityUser_Users.findById(usernameResult.data.id);
+            const userData = await identityUser_users.findById(usernameResult.data.id);
             if (userData.lockoutEnabled) {
                 const now = new Date();
                 if (userData.lockoutEnd && userData.lockoutEnd > now) {
@@ -87,7 +87,7 @@ export async function signInFailedAction(username: string) {
 
         if (usernameResult.status === "success") {
 
-            const userData = await IdentityUser_Users.findById(usernameResult.data.id);
+            const userData = await identityUser_users.findById(usernameResult.data.id);
             let accessFailed = userData.accessFailedCount + 1;
             let lockoutEnabled = false;
             let lockoutEnd = null;
@@ -99,7 +99,7 @@ export async function signInFailedAction(username: string) {
                 lockoutEnd = expiresAt;
             }
 
-            const updatedProduct = await IdentityUser_Users.findByIdAndUpdate(
+            const updatedProduct = await identityUser_users.findByIdAndUpdate(
                 usernameResult.data.id,
                 {
                     $set: {
@@ -137,12 +137,12 @@ export async function signInSuccessAction(username: string) {
 
         if (usernameResult.status === "success") {
 
-            const userData = await IdentityUser_Users.findById(usernameResult.data.id);
+            const userData = await identityUser_users.findById(usernameResult.data.id);
             let accessFailed = 0;
             let lockoutEnabled = false;
             let lockoutEnd = null;
 
-            const updatedProduct = await IdentityUser_Users.findByIdAndUpdate(
+            const updatedProduct = await identityUser_users.findByIdAndUpdate(
                 usernameResult.data.id,
                 {
                     $set: {

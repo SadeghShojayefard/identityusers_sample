@@ -1,6 +1,6 @@
 import UsersAddForm from "@/components/admin/users/usersAddForm/UsersAddForm";
-import { getClaimsAction } from "@/identityUser/helper/claimsAction";
-import { getRolesForAddUserAction } from "@/identityUser/helper/roleAction";
+import { getClaimsAction } from "@/identityuser/helper/claimsAction";
+import { getRolesForAddUserAction } from "@/identityuser/helper/roleAction";
 
 export default async function addUsersPage() {
 

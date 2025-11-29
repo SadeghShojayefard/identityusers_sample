@@ -1,5 +1,5 @@
 import NextAuth, { getServerSession, AuthOptions } from "next-auth";
-import { options } from "@/identityUser/api/auth/[...nextauth]/options";
+import { options } from "@/identityuser/api/auth/[...nextauth]/options";
 
 export const getSession = () => getServerSession(options);
 

@@ -1,11 +1,11 @@
 "use client"
 import Toast from '@/components/share/toast/Toast';
-import { UserUpdateAction } from '@/identityUser/helper/userAction';
+import { UserUpdateAction } from '@/identityuser/helper/userAction';
 import { useCustomForm } from '@/hooks/useCustomForm';
 import '@/style/site/signIn/signIn.css'
 import { claimType } from '@/type/claimType.type';
 import { userEditType } from '@/type/UserEditType.type';
-import { usersEditSchema } from '@/identityUser/validation/usersEditValidation';
+import { usersEditSchema } from '@/identityuser/validation/usersEditValidation';
 import { useState } from 'react';
 
 export default function UsersEditForm(
@@ -47,7 +47,7 @@ export default function UsersEditForm(
 
     return (
         <div className="formBody bg-white/10 rounded-2xl w-full" >
-            <div className="form-style">
+            <div className="form-style w-full">
                 <h2 className="form-title">EDIT USERS</h2>
 
                 {toastVisible && <Toast text={"New User Add Successfully"} />}
@@ -75,7 +75,7 @@ export default function UsersEditForm(
                         <input id='username' type="text" className="input-style"
                             key={fields.username.key}
                             name={fields.username.name}
-                            defaultValue={user.userName}
+                            defaultValue={user.username}
                         />
                         {fields.username.errors &&
                             <p className='text-md bg-red-300/50 backdrop-blur-2xl mt-5 p-1 inline-block rounded-2xl'>

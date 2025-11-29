@@ -1,10 +1,10 @@
 "use client"
 import Toast from '@/components/share/toast/Toast';
-import { roleUpdateAction } from '@/identityUser/helper/roleAction';
+import { roleUpdateAction } from '@/identityuser/helper/roleAction';
 import { useCustomForm } from '@/hooks/useCustomForm';
 import '@/style/site/signIn/signIn.css'
 import { claimType, roleType } from '@/type/claimType.type';
-import { userRoleUpdateSchema } from '@/identityUser/validation/userRoleUpdateValidation';
+import { userRoleUpdateSchema } from '@/identityuser/validation/userRoleUpdateValidation';
 import { useEffect, useState } from 'react';
 
 export default function UserRolesEditForm(
@@ -49,7 +49,7 @@ export default function UserRolesEditForm(
 
     return (
         <div className="formBody bg-white/10 rounded-2xl w-full" dir='ltr'>
-            <div className="form-style" >
+            <div className="form-style w-full" >
                 <h2 className="form-title">EDIT ROLES</h2>
 
                 {toastVisible && <Toast text={"New Role Add Successfully"} />}

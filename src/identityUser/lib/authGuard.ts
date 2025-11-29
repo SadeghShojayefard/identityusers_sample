@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { options } from "@/identityUser/api/auth/[...nextauth]/options";
+import { options } from "@/identityuser/api/auth/[...nextauth]/options";
 import { redirect } from "next/navigation";
 
 

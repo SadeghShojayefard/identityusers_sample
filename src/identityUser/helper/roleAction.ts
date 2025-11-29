@@ -1,18 +1,18 @@
 'use server';
-import dbConnect from "@/identityUser/lib/db";
-import IdentityUser_Roles from "@/identityUser/lib/models/identityUser_roles";
-import IdentityUser_RoleClaims from "@/identityUser/lib/models/identityUser_roleClaims";
-import IdentityUser_Users from "@/identityUser/lib/models/identityUser_users";
-import IdentityUser_UserRoles from "@/identityUser/lib/models/identityUser_userRoles";
+import dbConnect from "@/identityuser/lib/db";
+import identityUser_roles from "@/identityuser/lib/models/identityUser_roles";
+import identityUser_roleClaims from "@/identityuser/lib/models/identityUser_roleClaims";
+import identityUser_users from "@/identityuser/lib/models/identityUser_users";
+import identityUser_userRoles from "@/identityuser/lib/models/identityUser_userRoles";
 
-import { userRoleSchema } from "@/identityUser/validation/userRoleValidation";
+import { userRoleSchema } from "@/identityuser/validation/userRoleValidation";
 import { parseWithZod } from "@conform-to/zod";
 import { revalidatePath } from 'next/cache';
 import { randomUUID } from "crypto";
-import { deleteSchema } from "@/identityUser/validation/deleteValidation";
+import { deleteSchema } from "@/identityuser/validation/deleteValidation";
 import mongoose from "mongoose";
-import { userRoleUpdateSchema } from "@/identityUser/validation/userRoleUpdateValidation";
-import { hasClaim } from "@/identityUser/lib/session";
+import { userRoleUpdateSchema } from "@/identityuser/validation/userRoleUpdateValidation";
+import { hasClaim } from "@/identityuser/lib/session";
 
 export async function roleAddAction(prevState: unknown, formData: FormData) {
     // if (!(await hasClaim("add-roles"))) {
@@ -35,7 +35,7 @@ export async function roleAddAction(prevState: unknown, formData: FormData) {
         await dbConnect();
         // 1) Storing role data in the database
         const { name, description } = subMission.value;
-        const newRole = await IdentityUser_Roles.create({
+        const newRole = await identityUser_roles.create({
             name,
             normalizedName: name.toUpperCase(),
             concurrencyStamp: randomUUID(),
@@ -54,7 +54,7 @@ export async function roleAddAction(prevState: unknown, formData: FormData) {
             }));
 
             // A single request instead of multiple create
-            await IdentityUser_RoleClaims.insertMany(roleClaimsDocs, { ordered: false });
+            await identityUser_roleClaims.insertMany(roleClaimsDocs, { ordered: false });
         }
         // Revalidate
         revalidatePath('/cmsRoles');
@@ -100,7 +100,7 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
         await dbConnect();
 
         // 1) Checking the existence of Role
-        const existingRole = await IdentityUser_Roles.findById(id);
+        const existingRole = await identityUser_roles.findById(id);
         if (!existingRole) {
             return {
                 status: "error",
@@ -129,7 +129,7 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
         const roleId = existingRole._id;
 
         //    Get current Claims from the database (array of ObjectId or string)
-        const existingClaimsDocs = await IdentityUser_RoleClaims.find({ role: roleId }).select("claim").lean();
+        const existingClaimsDocs = await identityUser_roleClaims.find({ role: roleId }).select("claim").lean();
         const existingClaimIds = existingClaimsDocs.map((rc: any) => rc.claim.toString());
 
         const newClaimIds = Array.isArray(selectedClaims) ? selectedClaims : [];
@@ -140,7 +140,7 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
 
         // Remove unnecessary claims (in one command)
         if (claimsToRemove.length > 0) {
-            await IdentityUser_RoleClaims.deleteMany({ role: roleId, claim: { $in: claimsToRemove } });
+            await identityUser_roleClaims.deleteMany({ role: roleId, claim: { $in: claimsToRemove } });
         }
 
         // Adding new claims (in a bulk command)
@@ -149,11 +149,11 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
                 role: roleId,
                 claim: claimId,
             }));
-            await IdentityUser_RoleClaims.insertMany(docs, { ordered: false });
+            await identityUser_roleClaims.insertMany(docs, { ordered: false });
         }
 
         // 5) Update securityStamp of all users who have this Role
-        const userRoleDocs = await IdentityUser_UserRoles.find({ role: roleId }).select("user").lean();
+        const userRoleDocs = await identityUser_userRoles.find({ role: roleId }).select("user").lean();
         const userIds = userRoleDocs.map((ur: any) => ur.user).filter(Boolean);
 
         if (userIds.length > 0) {
@@ -165,7 +165,7 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
                     update: { $set: { securityStamp: randomUUID() } },
                 },
             }));
-            await IdentityUser_Users.bulkWrite(bulkOps);
+            await identityUser_users.bulkWrite(bulkOps);
         }
 
         // 6)  revalidate
@@ -206,7 +206,7 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
 
 
         // 1) Check and find if Role Exist
-        const role = await IdentityUser_Roles.findById(id);
+        const role = await identityUser_roles.findById(id);
         if (!role) {
             return {
                 status: 'error',
@@ -216,7 +216,7 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
 
 
         // 2) get the Role named User 
-        const userRole = await IdentityUser_Roles.findOne({ name: 'User' });
+        const userRole = await identityUser_roles.findOne({ name: 'User' });
         if (!userRole) {
             return {
                 status: 'error',
@@ -225,7 +225,7 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
         }
 
         // 3) Get the current userIds that have this role (from UserRoles)
-        const userRoleDocs = await IdentityUser_UserRoles.find({ role: id }).lean();
+        const userRoleDocs = await identityUser_userRoles.find({ role: id }).lean();
         const userIds = userRoleDocs.map((ur) => ur.user).filter(Boolean);
         // If userIds is empty, we continue (just remove RoleClaims and Role)
 
@@ -233,7 +233,7 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
 
         // 4) Change the role of all those users to the default role
         if (userIds.length > 0) {
-            await IdentityUser_UserRoles.updateMany({ role: id }, { $set: { role: userRole._id } });
+            await identityUser_userRoles.updateMany({ role: id }, { $set: { role: userRole._id } });
 
             // 5) enerate a new uuid for each user's securityStamp
             const bulkOps = userIds.map((uid) => ({
@@ -243,14 +243,14 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
                 },
             }));
 
-            await IdentityUser_Users.bulkWrite(bulkOps);
+            await identityUser_users.bulkWrite(bulkOps);
         }
 
         // 6) Delete RoleClaims related to this role
-        await IdentityUser_RoleClaims.deleteMany({ role: id });
+        await identityUser_roleClaims.deleteMany({ role: id });
 
         // Delete Role
-        await IdentityUser_Roles.findByIdAndDelete(id);
+        await identityUser_roles.findByIdAndDelete(id);
 
 
         revalidatePath('/cmsRoles');
@@ -274,7 +274,8 @@ export async function getRolesAction() {
     await dbConnect();
 
     try {
-        const rolesWithClaims = await IdentityUser_Roles.aggregate([
+        const rolesWithClaims = await identityUser_roles.aggregate([
+            // مرحله 1: پیدا کردن roleClaims برای هر role
             {
                 $lookup: {
                     from: "identityuser_roleclaims",
@@ -283,12 +284,16 @@ export async function getRolesAction() {
                     as: "roleClaims",
                 },
             },
+
+            // مرحله 2: باز کردن roleClaims (ممکنه خالی باشه)
             {
                 $unwind: {
                     path: "$roleClaims",
                     preserveNullAndEmptyArrays: true,
                 },
             },
+
+            // مرحله 3: لود claim اصلی
             {
                 $lookup: {
                     from: "identityuser_claims",
@@ -297,24 +302,31 @@ export async function getRolesAction() {
                     as: "claimData",
                 },
             },
+
+            // مرحله 4: باز کردن claimData
             {
                 $unwind: {
                     path: "$claimData",
                     preserveNullAndEmptyArrays: true,
                 },
             },
+
+            // مرحله 5: گروه‌بندی نهایی
             {
                 $group: {
                     _id: "$_id",
                     name: { $first: "$name" },
                     description: { $first: "$description" },
                     claimStamp: { $first: "$claimStamp" },
+
                     claims: {
                         $push: {
                             $cond: [
                                 { $ifNull: ["$claimData", false] },
                                 {
                                     id: { $toString: "$claimData._id" },
+                                    claimType: "$claimData.claimType",
+                                    claimValue: "$claimData.claimValue",
                                     description: "$claimData.description",
                                 },
                                 "$$REMOVE",
@@ -332,24 +344,25 @@ export async function getRolesAction() {
                 name: role.name,
                 description: role.description,
                 claimStamp: role.claimStamp,
-                claims: role.claims || [],
+                claims: role.claims,
             })),
-        } as const;
+        };
     } catch (error) {
         console.error('Error fetching roles:', error);
         return {
-            status: 'error',
+            status: "error",
             payload: [],
-        } as const;
+        };
     }
 }
+
 
 export async function getRolesForAddUserAction() {
 
     try {
         await dbConnect();
 
-        const roles = await IdentityUser_Roles.find({}, `name`)
+        const roles = await identityUser_roles.find({}, `name`)
             .lean<{ _id: mongoose.Types.ObjectId; name: string }[]>()
             .exec();
 
@@ -372,15 +385,15 @@ export async function getRolesForAddUserAction() {
 
 
 export async function getRoleByIDAction(roleId: string) {
-
     try {
         await dbConnect();
         const roleObjectId = new mongoose.Types.ObjectId(roleId);
 
-        const roleWithClaims = await IdentityUser_Roles.aggregate([
+        const roleWithClaims = await identityUser_roles.aggregate([
             {
                 $match: { _id: roleObjectId },
             },
+            // Load roleClaims
             {
                 $lookup: {
                     from: "identityuser_roleclaims",
@@ -395,6 +408,7 @@ export async function getRoleByIDAction(roleId: string) {
                     preserveNullAndEmptyArrays: true,
                 },
             },
+            // Load claimData
             {
                 $lookup: {
                     from: "identityuser_claims",
@@ -409,12 +423,14 @@ export async function getRoleByIDAction(roleId: string) {
                     preserveNullAndEmptyArrays: true,
                 },
             },
+            // Final grouping
             {
                 $group: {
                     _id: "$_id",
                     name: { $first: "$name" },
                     description: { $first: "$description" },
                     concurrencyStamp: { $first: "$concurrencyStamp" },
+
                     claims: {
                         $push: {
                             $cond: [
@@ -461,6 +477,5 @@ export async function getRoleByIDAction(roleId: string) {
         } as const;
     }
 }
-
 
 

@@ -1,9 +1,9 @@
 // File: src/app/api/session/update/route.ts
 import { getServerSession } from 'next-auth';
-import { options } from '@/identityUser/api/auth/[...nextauth]/options';
+import { options } from '@/identityuser/api/auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
-import dbConnect from '@/identityUser/lib/db';
-import { getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
+import dbConnect from '@/identityuser/lib/db';
+import { getUserByUsernameForSessionAction } from '@/identityuser/helper/userAction';
 
 export async function GET() {
     try {

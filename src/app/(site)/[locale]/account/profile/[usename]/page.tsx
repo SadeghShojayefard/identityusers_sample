@@ -2,8 +2,8 @@
 import UserInfo from "@/components/account/profile/userInfo/UserInfo";
 import ChangePassword from "@/components/account/profile/changePassword/ChangePassword";
 import ChangeName from "@/components/account/profile/changeName/ChangeName";
-import { requireAuth } from "@/identityUser/lib/authGuard";
-import { getCurrentCCSAction } from "@/identityUser/helper/userAction";
+import { requireAuth } from "@/identityuser/lib/authGuard";
+import { getCurrentCCSAction } from "@/identityuser/helper/userAction";
 
 export default async function AccountProfilePage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;

@@ -1,9 +1,9 @@
 import CredentialsProvider from 'next-auth/providers/credentials';
 import type { NextAuthOptions } from 'next-auth';
-import IdentityUser_Users from '@/identityUser/lib/models/identityUser_users';
-import { comparePassword } from '@/identityUser/helper/sharedFunction';
-import dbConnect from '@/identityUser/lib/db';
-import { getUserByUsernameForSessionAction } from '@/identityUser/helper/userAction';
+import identityUser_users from '@/identityuser/lib/models/identityUser_users';
+import { comparePassword } from '@/identityuser/helper/sharedFunction';
+import dbConnect from '@/identityuser/lib/db';
+import { getUserByUsernameForSessionAction } from '@/identityuser/helper/userAction';
 
 export const options: NextAuthOptions = {
     session: {
@@ -103,7 +103,7 @@ export const options: NextAuthOptions = {
         async session({ session, token }) {
 
             await dbConnect();
-            const user = await IdentityUser_Users.findById(token.id).select("securityStamp");
+            const user = await identityUser_users.findById(token.id).select("securityStamp");
 
 
             if (!user) {

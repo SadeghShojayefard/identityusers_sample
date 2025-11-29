@@ -2,9 +2,9 @@ import Sidebar from "@/components/admin/sidebar/Sidebar";
 import type { Metadata } from "next";
 import "../globals.css";
 import '@/style/site/signIn/signIn.css'
-import SessionWatcher from "@/identityUser/components/sessionWatcher/SessionWatcher";
-import AuthProvider from "@/identityUser/providers/SessionProvider";
-import { requireAuth } from "@/identityUser/lib/authGuard";
+import SessionWatcher from "@/identityuser/components/sessionWatcher/SessionWatcher";
+import AuthProvider from "@/identityuser/providers/SessionProvider";
+import { requireAuth } from "@/identityuser/lib/authGuard";
 
 
 

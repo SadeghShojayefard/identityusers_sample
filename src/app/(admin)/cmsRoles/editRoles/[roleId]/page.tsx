@@ -1,6 +1,6 @@
 import UserRolesEditForm from "@/components/admin/userRoles/userRolesEditForm/UserRolesEditForm";
-import { getClaimsAction } from "@/identityUser/helper/claimsAction";
-import { getRoleByIDAction } from "@/identityUser/helper/roleAction";
+import { getClaimsAction } from "@/identityuser/helper/claimsAction";
+import { getRoleByIDAction } from "@/identityuser/helper/roleAction";
 import { roleType } from "@/Type/claimType.type";
 
 export default async function editRolesPage({ params }: { params: Promise<{ roleId: string }> }) {

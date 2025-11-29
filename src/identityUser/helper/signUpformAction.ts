@@ -1,15 +1,15 @@
 'use server';
-import dbConnect from "@/identityUser/lib/db";
-import { signUpSchema } from "@/identityUser/validation/signUpValidation";
+import dbConnect from "@/identityuser/lib/db";
+import { signUpSchema } from "@/identityuser/validation/signUpValidation";
 import { parseWithZod } from "@conform-to/zod";
 import { revalidatePath } from "next/cache";
 import { checkUserExistByEmailAction, checkUserExistByUserNameAction } from "./userAction";
 import { hashPassword } from "./sharedFunction";
 import { randomUUID } from "crypto";
 import { redirect } from "next/navigation";
-import IdentityUser_Users from "@/identityUser/lib/models/identityUser_users";
-import IdentityUser_Roles from "@/identityUser/lib/models/identityUser_roles";
-import IdentityUser_UserRoles from "@/identityUser/lib/models/identityUser_userRoles";
+import identityUser_users from "@/identityuser/lib/models/identityUser_users";
+import identityUser_roles from "@/identityuser/lib/models/identityUser_roles";
+import identityUser_userRoles from "@/identityuser/lib/models/identityUser_userRoles";
 
 
 
@@ -63,7 +63,7 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
 
         const encryptPassword = await hashPassword(password);
 
-        const newUsers = await IdentityUser_Users.create({
+        const newUsers = await identityUser_users.create({
             username,
             normalizedUserName: username.toUpperCase(),
             email,
@@ -82,9 +82,9 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
 
         const userId = newUsers._id.toString();
 
-        const role = await IdentityUser_Roles.findOne({ normalizedName: "USER" });
+        const role = await identityUser_roles.findOne({ normalizedName: "USER" });
 
-        await IdentityUser_UserRoles.create({
+        await identityUser_userRoles.create({
             role: role._id,
             user: userId,
         })

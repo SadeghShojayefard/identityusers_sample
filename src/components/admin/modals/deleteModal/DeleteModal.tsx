@@ -12,7 +12,7 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog";
 import { useCustomForm } from "@/hooks/useCustomForm";
-import { deleteSchema } from "@/identityUser/validation/deleteValidation";
+import { deleteSchema } from "@/identityuser/validation/deleteValidation";
 import { DeleteModalType } from "@/type/DeleteModalType.type";
 import { useEffect, useState } from "react";
 

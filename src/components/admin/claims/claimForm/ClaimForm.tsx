@@ -1,8 +1,8 @@
 "use client"
 import Toast from '@/components/share/toast/Toast';
 import { useCustomForm } from '@/hooks/useCustomForm';
-import { addClaimAction } from '@/identityUser/helper/claimsAction';
-import { claimsSchema } from '@/identityUser/validation/claimsValidation';
+import { addClaimAction } from '@/identityuser/helper/claimsAction';
+import { claimsSchema } from '@/identityuser/validation/claimsValidation';
 import '@/style/site/signIn/signIn.css'
 
 
@@ -17,7 +17,7 @@ export default function ClaimForm() {
 
     return (
         <div className="formBody  bg-white/10  rounded-2xl w-full">
-            <div className="form-style">
+            <div className="form-style w-full">
                 <h2 className="form-title">Add New Claims </h2>
                 {toastVisible && (
                     <Toast text={"New Claim add successfully"} />

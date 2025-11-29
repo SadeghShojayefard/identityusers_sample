@@ -7,16 +7,16 @@ const identityUser_userRolesSchema = new Schema(
     {
         role: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "IdentityUser_Roles",
+            ref: "identityUser_roles",
             required: true,
         },
         user: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "IdentityUser_Users",
+            ref: "identityUser_users",
             required: true,
         },
     },
 );
 
-export default mongoose.models.IdentityUser_UserRoles || mongoose.model('IdentityUser_UserRoles', identityUser_userRolesSchema)
+export default mongoose.models.identityUser_userRoles || mongoose.model('identityUser_userRoles', identityUser_userRolesSchema)
 

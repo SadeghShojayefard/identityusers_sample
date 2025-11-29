@@ -1,14 +1,16 @@
-
 export type userEditType = {
     id: string,
-    userName: string,
+    username: string,
+    name: string,
     email: string,
     emailConfirmed: boolean,
     concurrencyStamp: string,
     phoneNumber: string,
     phoneNumberConfirmed: boolean,
     accessFailedCount: number,
-    name: string,
+    avatar: string,
+    securityStamp: string,
+    password: string,
     roles: {
         roleId: string,
         roleName: string
@@ -17,4 +19,8 @@ export type userEditType = {
         claimID: string,
         claimDescription: string
     }[] | []
-} 
+}
+
+
+
+

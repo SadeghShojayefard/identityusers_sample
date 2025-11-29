@@ -1,19 +1,19 @@
 'use server';
-import dbConnect from "@/identityUser/lib/db";
-import { claimsSchema } from "@/identityUser/validation/claimsValidation";
-import { deleteSchema } from "@/identityUser/validation/deleteValidation";
-import { updateClaimsSchema } from "@/identityUser/validation/updateClaimsValidation";
+import dbConnect from "@/identityuser/lib/db";
+import { claimsSchema } from "@/identityuser/validation/claimsValidation";
+import { deleteSchema } from "@/identityuser/validation/deleteValidation";
+import { updateClaimsSchema } from "@/identityuser/validation/updateClaimsValidation";
 import { parseWithZod } from "@conform-to/zod";
 import mongoose from "mongoose";
 import { revalidatePath } from 'next/cache';
-import IdentityUser_Claims from "@/identityUser/lib/models/identityUser_claims";
-import IdentityUser_Users from "@/identityUser/lib/models/identityUser_users";
-import IdentityUser_UserRoles from "@/identityUser/lib/models/identityUser_userRoles";
-import IdentityUser_Roles from "@/identityUser/lib/models/identityUser_roles";
-import IdentityUser_RoleClaims from "@/identityUser/lib/models/identityUser_roleClaims";
-import IdentityUser_UserClaims from "@/identityUser/lib/models/identityUser_userClaims";
+import identityUser_claims from "@/identityuser/lib/models/identityUser_claims";
+import identityUser_users from "@/identityuser/lib/models/identityUser_users";
+import identityUser_userRoles from "@/identityuser/lib/models/identityUser_userRoles";
+import identityUser_roles from "@/identityuser/lib/models/identityUser_roles";
+import identityUser_roleClaims from "@/identityuser/lib/models/identityUser_roleClaims";
+import identityUser_userClaims from "@/identityuser/lib/models/identityUser_userClaims";
 import { randomUUID } from "crypto";
-import { hasClaim } from "@/identityUser/lib/session";
+import { hasClaim } from "@/identityuser/lib/session";
 
 
 export async function addClaimAction(prevState: unknown, formData: FormData) {
@@ -41,7 +41,7 @@ export async function addClaimAction(prevState: unknown, formData: FormData) {
         await dbConnect();
         // Create new claim and save to database
         const { claimType, claimValue, description } = subMission.value;
-        await IdentityUser_Claims.create({
+        await identityUser_claims.create({
             claimType,
             claimValue,
             description
@@ -72,7 +72,7 @@ export async function getClaimsAction() {
     await dbConnect();
 
     try {
-        const claims = await IdentityUser_Claims.find({}, 'claimType claimValue description').sort({ claimType: 1, claimValue: 1 }).lean().exec();
+        const claims = await identityUser_claims.find({}, 'claimType claimValue description').sort({ claimType: 1, claimValue: 1 }).lean().exec();
         return {
             status: 'success',
             payload: claims.map((item: any) => ({
@@ -118,7 +118,7 @@ export async function deleteClaimsAction(prevState: unknown, formData: FormData)
         const claimId = new mongoose.Types.ObjectId(id);
 
         // 2) Delete the current claim
-        const deletedClaim = await IdentityUser_Claims.findByIdAndDelete(claimId).exec();
+        const deletedClaim = await identityUser_claims.findByIdAndDelete(claimId).exec();
 
         if (!deletedClaim) {
             return {
@@ -128,25 +128,25 @@ export async function deleteClaimsAction(prevState: unknown, formData: FormData)
         }
 
         //3) Find the Roles that have current claim
-        const affectedRoles = await IdentityUser_RoleClaims.find({
+        const affectedRoles = await identityUser_roleClaims.find({
             claim: claimId,
         }).select("role");
 
         // 4)  Find the Users that have current claim
-        const affectedUsers = await IdentityUser_UserClaims.find({
+        const affectedUsers = await identityUser_userClaims.find({
             claim: claimId,
         }).select("user");
 
         // 5) romove the Related Roles from RoleClaims Table
-        await IdentityUser_RoleClaims.deleteMany({ claim: claimId });
+        await identityUser_roleClaims.deleteMany({ claim: claimId });
 
         // 6) romove the Related Users from UserClaims Table
-        await IdentityUser_UserClaims.deleteMany({ claim: claimId });
+        await identityUser_userClaims.deleteMany({ claim: claimId });
 
         // 7) Update the claimStamp from related Roles in the Roles Table
         const rolesToUpdate = Array.from(new Set(affectedRoles.map((r: any) => r.role.toString())));
         if (rolesToUpdate.length > 0) {
-            await IdentityUser_Roles.updateMany(
+            await identityUser_roles.updateMany(
                 { _id: { $in: rolesToUpdate } },
                 { $set: { claimStamp: randomUUID() } }
             );
@@ -155,7 +155,7 @@ export async function deleteClaimsAction(prevState: unknown, formData: FormData)
         // 7) Update the securityStamp from related users in the Users Table
         const usersToUpdate = Array.from(new Set(affectedUsers.map((u: any) => u.user.toString())));
         if (usersToUpdate.length > 0) {
-            await IdentityUser_Users.updateMany(
+            await identityUser_users.updateMany(
                 { _id: { $in: usersToUpdate } },
                 { $set: { securityStamp: randomUUID() } }
             );
@@ -201,7 +201,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         await dbConnect();
 
         // 1)  Find the Current Claim
-        const existing = await IdentityUser_Claims.findById(submission.value.id);
+        const existing = await identityUser_claims.findById(submission.value.id);
         if (!existing) {
             return {
                 status: "error",
@@ -220,7 +220,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
             submission.value.description?.trim() || existing.description;
 
         //3) Claim Update
-        const updatedClaim = await IdentityUser_Claims.findByIdAndUpdate(
+        const updatedClaim = await identityUser_claims.findByIdAndUpdate(
             submission.value.id,
             {
                 $set: {
@@ -235,7 +235,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         // -------------------------------
         // 4) Find the Roles have Updated Claims
         // -------------------------------
-        const affectedRoles = await IdentityUser_RoleClaims.find({
+        const affectedRoles = await identityUser_roleClaims.find({
             claim: submission.value.id,
         }).lean();
 
@@ -244,7 +244,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         );
 
         if (rolesToUpdate.length > 0) {
-            await IdentityUser_Roles.updateMany(
+            await identityUser_roles.updateMany(
                 { _id: { $in: rolesToUpdate } },
                 { $set: { claimStamp: randomUUID() } }
             );
@@ -253,7 +253,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         // -------------------------------
         // 5) Find the Users own Updated Claims
         // -------------------------------
-        const affectedUsersFromRoles = await IdentityUser_UserRoles.find({
+        const affectedUsersFromRoles = await identityUser_userRoles.find({
             role: { $in: rolesToUpdate },
         }).lean();
 
@@ -264,7 +264,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         // -------------------------------
         //  6) Find users who directly own Updated Claim (UserClaims)
         // -------------------------------
-        const affectedUsersDirect = await IdentityUser_UserClaims.find({
+        const affectedUsersDirect = await identityUser_userClaims.find({
             claim: submission.value.id,
         }).lean();
 
@@ -280,7 +280,7 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
         );
 
         if (usersToUpdate.length > 0) {
-            await IdentityUser_Users.updateMany(
+            await identityUser_users.updateMany(
                 { _id: { $in: usersToUpdate } },
                 { $set: { securityStamp: randomUUID() } }
             );

@@ -1,10 +1,10 @@
 "use client"
 import Toast from '@/components/share/toast/Toast';
-import { AddUserAction } from '@/identityUser/helper/userAction';
+import { AddUserAction } from '@/identityuser/helper/userAction';
 import { useCustomForm } from '@/hooks/useCustomForm';
 import '@/style/site/signIn/signIn.css'
 import { claimType } from '@/type/claimType.type';
-import { usersAddSchema } from '@/identityUser/validation/usersAddValidation';
+import { usersAddSchema } from '@/identityuser/validation/usersAddValidation';
 import { useState } from 'react';
 
 export default function UsersAddForm(
@@ -43,7 +43,7 @@ export default function UsersAddForm(
 
     return (
         <div className="formBody bg-white/10 rounded-2xl w-full" >
-            <div className="form-style">
+            <div className="form-style w-full">
                 <h2 className="form-title">ADD NEW USERS</h2>
 
                 {toastVisible && <Toast text={"New User Add Successfully"} />}

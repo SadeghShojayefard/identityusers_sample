@@ -1,11 +1,12 @@
 "use client"
-import { canUserSignInAction, signInFailedAction, signInFormAction, signInSuccessAction } from "@/identityUser/helper/signInFormAction";
-import { SignInSchema } from "@/identityUser/validation/signInValidation";
+import { canUserSignInAction, signInFailedAction, signInFormAction, signInSuccessAction } from "@/identityuser/helper/signInFormAction";
+import { SignInSchema } from "@/identityuser/validation/signInValidation";
 import { useCustomForm } from "@/hooks/useCustomForm";
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { hasPayload } from "@/type/actionType.type";
+import Link from "next/link";
 
 
 
@@ -76,7 +77,7 @@ export default function LoginForm() {
 
     return (
         <div className="formBody bg-white/30 w-1/2 ">
-            <div className="form-style">
+            <div className="form-style w-full">
                 <h2 className="form-title">Sign In</h2>
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
 
@@ -131,11 +132,26 @@ export default function LoginForm() {
                             >
                                 {isPending ? 'login in sec...' : "Login"}
                             </button>
+
+
                         </div>
+
+                        {/* <div className="sm:col-span-2 md:col-span-1 w-full">
+
+                            <Link
+                                href={"./forgetPassword"}
+                                className="w-full bg-teal-500 backdrop-blur-2xl text-white p-2 mt-4 rounded-2xl cursor-pointer shadow-xl shadow-teal-800 hover:bg-teal-600
+                                flex flex-row justify-center items-center"
+                            >
+                                Forget Password ?
+                            </Link>
+                        </div> */}
 
 
                     </div>
                 </form>
+
+
             </div>
         </div>
     )

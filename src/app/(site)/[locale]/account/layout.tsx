@@ -1,9 +1,9 @@
 
 import '@/style/site/signIn/signIn.css'
 import AccountSidebar from "@/components/account/sideBar/SideBar";
-import { requireAuth } from '@/identityUser/lib/authGuard';
-import AuthProvider from '@/identityUser/providers/SessionProvider';
-import SessionWatcher from '@/identityUser/components/sessionWatcher/SessionWatcher';
+import { requireAuth } from '@/identityuser/lib/authGuard';
+import AuthProvider from '@/identityuser/providers/SessionProvider';
+import SessionWatcher from '@/identityuser/components/sessionWatcher/SessionWatcher';
 
 
 

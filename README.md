@@ -1,4 +1,4 @@
-# IdentityUser Test Project
+# identityuser Test Project
 
 This repository is a **demo and testing environment** for the `identityuser` NPM package.
 Its main purpose is to help developers understand how the package works and to provide a ready-to-use example for integration and testing.
@@ -21,7 +21,7 @@ The Test Project demonstrates:
 
 A detailed PDF guide is included in this repository:
 
-**`/docs/IdentityUser-Guide.pdf`**
+**`/docs/identityuser-Guide.pdf`**
 (Contains full explanations, examples, and setup instructions.)
 
 ---
@@ -46,10 +46,10 @@ npm run dev
 
 ## 🔗 Related Repositories
 
-* IdentityUser NPM Package:
+* identityuser NPM Package:
   [https://www.npmjs.com/package/identityuser](https://www.npmjs.com/package/identityuser)
 
-* **IdentityUser Core Repository (GitHub):**
+* **identityuser Core Repository (GitHub):**
 [https://www.npmjs.com/package/identityuser](https://www.npmjs.com/package/identityuser)
 ---
 
@@ -77,7 +77,7 @@ This avoids guesswork and speeds up integration.
 
 A detailed PDF guide is included in this repository:
 
-**[📘 Click here to download the full IdentityUser Documentation](https://github.com/SadeghShojayefard/identityusers_sample/blob/main/IdentityUser_Documentation.pdf)**
+**[📘 Click here to download the full identityuser Documentation](https://github.com/SadeghShojayefard/identityusers_sample/blob/main/identityuser_Documentation.pdf)**
 
 (Contains full explanations, examples, and setup instructions.)
 

@@ -1,8 +1,9 @@
 "use client"
 
 import { useCustomForm } from "@/hooks/useCustomForm";
-import { changeNameAction } from "@/identityUser/helper/userAction";
-import { changeNameSchema } from "@/identityUser/validation/changeNameValidation";
+import { changeNameAction } from "@/identityuser/helper/userAction";
+import { changeNameSchema } from "@/identityuser/validation/changeNameValidation";
+import { hasPayload } from "@/type/actionType.type";
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 
@@ -40,7 +41,7 @@ const ChangeName: React.FC<{
                             user: {
                                 id: json.user.id,
                                 username: json.user.username,
-                                name: json.user.name ?? null,
+                                name: hasPayload(lastResult) ? lastResult.payload.name : json.user.name || null,
                                 email: json.user.email,
                                 avatar: json.user.avatar,
                                 securityStamp: json.user.securityStamp,
@@ -74,7 +75,7 @@ const ChangeName: React.FC<{
             <b className="font-bold text-lg text-black text-shadow-xs text-shadow-black text-start w-full"></b>
 
             <div className="w-full p-10 flex items-center justify-start text-black z-10 shadow-2xl shadow-black  bg-white/10 rounded-2xl ">
-                <div className="form-style ">
+                <div className="form-style w-full ">
                     <h2 className="form-title">Change Name   </h2>
 
                     {toastVisible && (

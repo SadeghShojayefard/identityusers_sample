@@ -1,4 +1,4 @@
-import { hasClaim } from "@/identityUser/lib/session";
+import { hasClaim } from "@/identityuser/lib/session";
 import { redirect } from "next/navigation";
 
 export default async function CmsOffsPage() {

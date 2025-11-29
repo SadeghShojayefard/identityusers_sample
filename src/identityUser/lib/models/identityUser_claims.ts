@@ -24,5 +24,5 @@ const identityUser_claimsSchema = new Schema(
     },
 );
 
-export default mongoose.models.IdentityUser_Claims || mongoose.model('IdentityUser_Claims', identityUser_claimsSchema)
+export default mongoose.models.identityUser_claims || mongoose.model('identityUser_claims', identityUser_claimsSchema)
 

@@ -33,5 +33,5 @@ const identityUser_rolesSchema = new Schema(
     },
 );
 
-export default mongoose.models.IdentityUser_Roles || mongoose.model('IdentityUser_Roles', identityUser_rolesSchema)
+export default mongoose.models.identityUser_roles || mongoose.model('identityUser_roles', identityUser_rolesSchema)
 

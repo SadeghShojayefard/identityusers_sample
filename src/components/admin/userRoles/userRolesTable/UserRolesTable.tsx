@@ -8,7 +8,7 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import '@/style/site/signIn/signIn.css'
-import { deleteRoleAction, getRolesAction } from "@/identityUser/helper/roleAction";
+import { deleteRoleAction, getRolesAction } from "@/identityuser/helper/roleAction";
 import DetailModal from "../../modals/detailModal/DetailModal";
 import { useEffect, useState } from "react";
 import DeleteModal from "../../modals/deleteModal/DeleteModal";
@@ -51,7 +51,7 @@ export default function UserRolesTable({ editClaim, deleteClaim, detailsClaim }:
     if (loading) {
         return <div>Loading Roles...</div>;
     }
-
+    console.log(roles);
     return (
         <div className="w-full  flex flex-col justify-center items-center gap-2 
          text-start  pb-5 shadow-2xl shadow-black rounded-2xl px-2 mt-5 bg-transparent" dir="ltr">

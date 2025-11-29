@@ -1,6 +1,6 @@
 
 
-import { options } from "@/identityUser/api/auth/[...nextauth]/options";
+import { options } from "@/identityuser/api/auth/[...nextauth]/options";
 import { getServerSession } from "next-auth";
 const UserInfo: React.FC = async () => {
 

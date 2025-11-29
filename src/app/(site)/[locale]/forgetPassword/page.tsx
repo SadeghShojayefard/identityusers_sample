@@ -1,12 +1,11 @@
 import '@/style/site/signIn/signIn.css'
-import LoginForm from "@/components/site/signIn/LoginForm";
-import SignUpForm from "@/components/site/signIn/SignUpForm";
 import { requireGuest } from '@/identityuser/lib/authGuard';
 import AuthProvider from '@/identityuser/providers/SessionProvider';
 import SessionWatcher from '@/identityuser/components/sessionWatcher/SessionWatcher';
+import ForgetForm from '@/components/site/signIn/ForgetForm';
 
 
-export default async function SignInPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function ForgetPasswordPage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
 
     await requireGuest(`/${locale}`);
@@ -20,10 +19,7 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
             </AuthProvider>
             <div className="relative w-full h-[calc(100vh-65px)] flex">
 
-
-
-                <SignUpForm />
-                <LoginForm />
+                <ForgetForm />
 
 
             </div>

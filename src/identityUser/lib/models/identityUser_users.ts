@@ -76,4 +76,4 @@ const identityUser_usersSchema = new Schema(
     { timestamps: true }
 );
 
-export default mongoose.models.IdentityUser_Users || mongoose.model('IdentityUser_Users', identityUser_usersSchema)
+export default mongoose.models.identityUser_users || mongoose.model('identityUser_users', identityUser_usersSchema)

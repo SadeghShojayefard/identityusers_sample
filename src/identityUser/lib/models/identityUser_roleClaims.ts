@@ -7,16 +7,16 @@ const identityUser_roleClaimsSchema = new Schema(
     {
         role: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "IdentityUser_Roles",
+            ref: "identityUser_roles",
             required: true,
         },
         claim: {
             type: mongoose.Schema.Types.ObjectId,
-            ref: "IdentityUser_Claims",
+            ref: "identityUser_claims",
             required: true,
         },
     },
 );
 
-export default mongoose.models.IdentityUser_RoleClaims || mongoose.model('IdentityUser_RoleClaims', identityUser_roleClaimsSchema)
+export default mongoose.models.identityUser_roleClaims || mongoose.model('identityUser_roleClaims', identityUser_roleClaimsSchema)
 

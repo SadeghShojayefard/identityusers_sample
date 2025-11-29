@@ -1,7 +1,7 @@
 "use client"
-import { signUpformAction } from "@/identityUser/helper/signUpformAction";
+import { signUpformAction } from "@/identityuser/helper/signUpformAction";
 import { useCustomForm } from "@/hooks/useCustomForm";
-import { signUpSchema } from "@/identityUser/validation/signUpValidation";
+import { signUpSchema } from "@/identityuser/validation/signUpValidation";
 import { signIn } from "next-auth/react";
 import { useEffect } from "react";
 import { hasPayload } from "@/type/actionType.type";
@@ -44,7 +44,7 @@ export default function SignUpForm() {
 
     return (
         <div className="formBody  bg-white/10 w-1/2">
-            <div className="form-style">
+            <div className="form-style w-full">
                 <h2 className="form-title">Sign Up</h2>
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
 

@@ -1,5 +1,5 @@
 import UsersTable from "@/components/admin/users/usersTable/UsersTable";
-import { hasClaim } from "@/identityUser/lib/session";
+import { hasClaim } from "@/identityuser/lib/session";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 

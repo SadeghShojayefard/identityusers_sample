@@ -10,12 +10,12 @@ import {
     TableRow,
 } from "@/components/ui/table"
 import '@/style/site/signIn/signIn.css'
-import { deleteClaimsAction, getClaimsAction, updateClaimsAction } from "@/identityUser/helper/claimsAction";
+import { deleteClaimsAction, getClaimsAction, updateClaimsAction } from "@/identityuser/helper/claimsAction";
 import DeleteModal from "../../modals/deleteModal/DeleteModal";
 import { useEffect, useState } from "react";
 import EditModal from "../../modals/editModal/EditModal";
 import EditModalInput from "../../modals/editModalInput/EditModalInput";
-import { updateClaimsSchema } from "@/identityUser/validation/updateClaimsValidation";
+import { updateClaimsSchema } from "@/identityuser/validation/updateClaimsValidation";
 
 
 export default function ClaimTable({ editClaim, deleteClaim }: { editClaim: boolean, deleteClaim: boolean }) {

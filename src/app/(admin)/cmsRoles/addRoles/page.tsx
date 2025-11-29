@@ -1,5 +1,5 @@
 import UserRolesForm from "@/components/admin/userRoles/userRolesForm/UserRolesForm";
-import { getClaimsAction } from "@/identityUser/helper/claimsAction";
+import { getClaimsAction } from "@/identityuser/helper/claimsAction";
 
 export default async function addRolesPage() {
 

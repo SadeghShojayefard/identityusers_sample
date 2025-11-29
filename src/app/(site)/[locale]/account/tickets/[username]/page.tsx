@@ -1,4 +1,4 @@
-import { requireAuth } from "@/identityUser/lib/authGuard";
+import { requireAuth } from "@/identityuser/lib/authGuard";
 
 
 export default async function TicketsPage({ params }: { params: Promise<{ locale: string }> }) {

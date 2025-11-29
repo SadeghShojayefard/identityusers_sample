@@ -1,4 +1,4 @@
-import AuthProvider from "@/identityUser/providers/SessionProvider";
+import AuthProvider from "@/identityuser/providers/SessionProvider";
 import "../../globals.css";
 import Header from "@/components/share/Header/Header";
 

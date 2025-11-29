@@ -11,11 +11,12 @@ import Image from "next/image";
 import EditModal from "../../modals/editModal/EditModal";
 import EditModalInput from "../../modals/editModalInput/EditModalInput";
 import { useEffect, useState } from "react";
-import { changePasswordAction, deleteUserAction, getAllUsersAction } from "@/identityUser/helper/userAction";
+import { changePasswordAction, deleteUserAction, getAllUsersAction, LockUnlockUserAction, resetPasswordAction, resetSecurityStampAction } from "@/identityuser/helper/userAction";
 import DetailModal from "../../modals/detailModal/DetailModal";
 import DeleteModal from "../../modals/deleteModal/DeleteModal";
-import { ChangePasswordUserShema } from "@/identityUser/validation/ChangePasswordUserValidation";
+import { ChangePasswordUserShema } from "@/identityuser/validation/ChangePasswordUserValidation";
 import Link from "next/link";
+import { deleteSchema } from "@/identityuser/validation/deleteValidation";
 
 
 export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passwordClaim }:
@@ -232,7 +233,7 @@ export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passw
                                             text="Please Enter the New Password"
                                             isUpdate={handlePageChange}
                                             buttonText="Change Password"
-                                            action={changePasswordAction}
+                                            action={resetPasswordAction}
                                             schema={ChangePasswordUserShema()}
                                         >
                                             {(fields) => (
@@ -259,7 +260,6 @@ export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passw
                                                 </>
                                             )}
                                         </EditModal>
-
                                     }
 
 
@@ -274,7 +274,7 @@ export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passw
                                         deleteClaim &&
                                         <DeleteModal
                                             title="Remove User"
-                                            text={`Are you sure you want to delete ${item.username} role?`}
+                                            text={`Are you sure you want to delete ${item.username} User?`}
                                             buttonText="delete"
                                             itemId={item.id}
                                             action={deleteUserAction}
@@ -282,6 +282,59 @@ export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passw
                                         />
                                     }
 
+                                    {
+                                        // reset session
+                                        <EditModal
+                                            title="Reset User Session"
+                                            text={`Are you sure you want to reset ${item.username} session?`}
+                                            isUpdate={handlePageChange}
+                                            buttonText="Reset Session"
+                                            action={resetSecurityStampAction}
+                                            schema={deleteSchema()}
+                                        >
+                                            {(fields) => (
+                                                <>
+
+                                                    <EditModalInput
+                                                        inputType="hidden"
+                                                        onUpdateInputs={handleUpdateInputs}
+                                                        value={item.id}
+                                                        placeholder=""
+                                                        id="id"
+                                                        fieldKey="id"
+                                                        fields={fields}
+                                                    />
+                                                </>
+                                            )}
+                                        </EditModal>
+                                    }
+
+                                    {
+                                        //LockUnlockUserAction
+                                        <EditModal
+                                            title={`${item.lockoutEnabled ? "Unlock User" : "Lock User"}`}
+                                            text={`Are you sure you want to ${item.lockoutEnabled ? "Unlock" : "Lock"} ${item.username} session?`}
+                                            isUpdate={handlePageChange}
+                                            buttonText={`${item.lockoutEnabled ? "Unlock" : "Lock"}`}
+                                            action={LockUnlockUserAction}
+                                            schema={deleteSchema()}
+                                        >
+                                            {(fields) => (
+                                                <>
+
+                                                    <EditModalInput
+                                                        inputType="hidden"
+                                                        onUpdateInputs={handleUpdateInputs}
+                                                        value={item.id}
+                                                        placeholder=""
+                                                        id="id"
+                                                        fieldKey="id"
+                                                        fields={fields}
+                                                    />
+                                                </>
+                                            )}
+                                        </EditModal>
+                                    }
 
                                 </TableCell>
                             </TableRow>
