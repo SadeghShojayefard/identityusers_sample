@@ -1,4 +1,4 @@
-// File: src/app/api/session/update/route.ts
+
 import { getServerSession } from 'next-auth';
 import { options } from '@/identityuser/api/auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
@@ -28,10 +28,14 @@ export async function GET() {
                 username: userPayload?.username,
                 name: userPayload?.name,
                 email: userPayload?.email,
+                phoneNumber: userPayload?.phoneNumber,
                 avatar: userPayload?.avatar,
                 securityStamp: userPayload?.securityStamp,
                 roles: userPayload?.roles,
-                claims: userPayload?.claims
+                claims: userPayload?.claims,
+                emailConfirmed: userPayload?.emailConfirmed,
+                phoneNumberConfirmed: userPayload?.phoneNumberConfirmed,
+                twoFactorEnabled: userPayload?.twoFactorEnabled,
 
             },
         });

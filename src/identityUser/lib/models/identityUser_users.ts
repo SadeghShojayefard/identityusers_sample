@@ -50,6 +50,20 @@ const identityUser_usersSchema = new Schema(
             type: Schema.Types.Boolean,
             required: true
         },
+        twoFactorSecret: {
+            type: Schema.Types.String,
+            required: false
+        },
+
+        recoveryCodes: {
+            type: [Schema.Types.String],
+            required: false,
+        },
+        // twoFactorMethod: { // Used Email or Phone for Forget Password
+        //     type: String,
+        //     enum: ["none", "totp", "sms", "email"],
+        //     required: false,
+        // },
         lockoutEnd: {
             type: Schema.Types.Date,
             required: false

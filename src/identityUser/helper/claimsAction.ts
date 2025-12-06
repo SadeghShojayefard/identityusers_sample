@@ -32,7 +32,10 @@ export async function addClaimAction(prevState: unknown, formData: FormData) {
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
 
@@ -107,7 +110,10 @@ export async function deleteClaimsAction(prevState: unknown, formData: FormData)
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     const { id } = subMission.value;
@@ -194,7 +200,10 @@ export async function updateClaimsAction(prevState: unknown, formData: FormData)
     });
 
     if (submission.status !== "success") {
-        return submission.reply();
+        return {
+            status: "error",
+            payload: { message: submission.reply() }
+        } as const;
     }
 
     try {

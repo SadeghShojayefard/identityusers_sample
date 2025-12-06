@@ -4,18 +4,28 @@ import ChangePassword from "@/components/account/profile/changePassword/ChangePa
 import ChangeName from "@/components/account/profile/changeName/ChangeName";
 import { requireAuth } from "@/identityuser/lib/authGuard";
 import { getCurrentCCSAction } from "@/identityuser/helper/userAction";
+import Varification from "@/components/account/profile/varification/Varification";
+import { getServerSession } from "next-auth";
+import { options } from "@/identityuser/api/auth/[...nextauth]/options";
 
 export default async function AccountProfilePage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
 
     const session = await requireAuth(`/${locale}`);
     const ccsDate = await getCurrentCCSAction(session?.user.username!);
-
+    const sessionData = await getServerSession(options);
     return (
         <div className="w-full  flex flex-col justify-start items-center gap-2  text-start  pb-5  ">
             <b className="font-extrabold text-2xl text-black text-shadow-xs text-shadow-black text-start w-full border-b">Profile</b>
-            <UserInfo />
-
+            <UserInfo username={sessionData?.user.username} name={sessionData?.user.name} email={sessionData?.user.email} phoneNumber={sessionData?.user.phoneNumber} />
+            <Varification
+                id={sessionData?.user.id}
+                email={sessionData?.user.email}
+                phoneNumber={sessionData?.user.phoneNumber}
+                emailConfirmed={sessionData?.user.emailConfirmed}
+                phoneNumberConfirmed={sessionData?.user.phoneNumberConfirmed}
+                twoFactorEnabled={sessionData?.user.twoFactorEnabled}
+            />
             <ChangeName
                 username={session?.user.username!}
                 name={session?.user.name!}

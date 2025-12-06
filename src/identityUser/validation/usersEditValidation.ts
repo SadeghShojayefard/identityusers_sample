@@ -19,9 +19,9 @@ export const usersEditSchema = () => {
             .max(20, { message: "Name field should at most have 20 character." })
             .optional(),
         phoneNumber: z
-            .string({ required_error: "Please fill the Name field first" })
-            .min(5, { message: "Name field should at least have 5 character" })
-            .max(20, { message: "Name field should at most have 20 character." })
+            .string({ required_error: "Please fill the phoneNumber field first" })
+            .min(5, { message: "phoneNumber field should at least have 5 character" })
+            .max(20, { message: "phoneNumber field should at most have 20 character." })
             .optional(),
         phoneNumberConfirmed: z.string(),
         accessFailedCount: z.number(),

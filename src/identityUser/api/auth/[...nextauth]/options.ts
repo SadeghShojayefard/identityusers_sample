@@ -36,10 +36,14 @@ export const options: NextAuthOptions = {
                     username: userData.username,
                     name: userData.name,
                     email: userData.email,
+                    phoneNumber: userData.phoneNumber,
                     avatar: userData.avatar,
                     securityStamp: userData.securityStamp,
                     roles: userData.roles ?? [],
-                    claims: userData.claims ?? []
+                    claims: userData.claims ?? [],
+                    emailConfirmed: userData.emailConfirmed,
+                    phoneNumberConfirmed: userData.phoneNumberConfirmed,
+                    twoFactorEnabled: userData.twoFactorEnabled,
                 };
             },
         }),
@@ -48,19 +52,21 @@ export const options: NextAuthOptions = {
     callbacks: {
         async jwt({ token, user, trigger, session }) {
 
-            // اول لاگین → پر کردن توکن
             if (user) {
                 token.id = user.id;
                 token.username = user.username;
                 token.name = user.name;
                 token.email = user.email;
+                token.phoneNumber = user.phoneNumber;
                 token.avatar = user.avatar;
                 token.roles = user.roles;
                 token.securityStamp = user.securityStamp;
                 token.claims = user.claims;
+                token.emailConfirmed = user.emailConfirmed;
+                token.phoneNumberConfirmed = user.phoneNumberConfirmed;
+                token.twoFactorEnabled = user.twoFactorEnabled;
             }
 
-            // آپدیت بعد از update()
             if (trigger === "update" && session?.user) {
 
                 if (session.user.name !== undefined)
@@ -77,6 +83,22 @@ export const options: NextAuthOptions = {
 
                 if (session.user.securityStamp !== undefined)
                     token.securityStamp = session.user.securityStamp;
+
+                if (session.user.emailConfirmed === true) {
+                    token.emailConfirmed = true;
+                }
+                else { token.emailConfirmed = false; }
+
+                if (session.user.phoneNumberConfirmed === true) {
+                    token.phoneNumberConfirmed = true;
+                }
+                else { token.phoneNumberConfirmed = false; }
+
+                if (session.user.twoFactorEnabled === true) {
+                    token.twoFactorEnabled = true;
+                }
+                else { token.twoFactorEnabled = false; }
+
             }
             //         //  Sync every 30 min
             const SYNC_INTERVAL = 30 * 60 * 1000;
@@ -103,7 +125,7 @@ export const options: NextAuthOptions = {
         async session({ session, token }) {
 
             await dbConnect();
-            const user = await identityUser_users.findById(token.id).select("securityStamp");
+            const user = await identityUser_users.findById(token.id);
 
 
             if (!user) {
@@ -123,6 +145,8 @@ export const options: NextAuthOptions = {
                     expires: new Date(0).toISOString(),
                 };
             }
+
+
 
             const freshUser = (await getUserByUsernameForSessionAction(user.username)).payload;
 
@@ -170,13 +194,19 @@ export const options: NextAuthOptions = {
                 username: token.username as string,
                 name: token.name as string,
                 email: token.email as string,
+                phoneNumber: token.phoneNumber as string,
                 avatar: token.avatar as string,
                 roles: token.roles as string[],
                 securityStamp: token.securityStamp as string,
                 claims: token.claims as string[],
+                emailConfirmed: token.emailConfirmed as boolean,
+                phoneNumberConfirmed: token.phoneNumberConfirmed as boolean,
+                twoFactorEnabled: token.twoFactorEnabled as boolean,
             };
             return session;
         },
 
     }
 };
+
+

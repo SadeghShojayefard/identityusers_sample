@@ -20,8 +20,9 @@ import { changeNameSchema } from "@/identityuser/validation/changeNameValidation
 import { changePasswordSchema } from "@/identityuser/validation/changePassword";
 import { hasAnyClaim, hasClaim } from "@/identityuser/lib/session";
 import { changeUserNameSchema } from "../validation/changeUserNameValidation";
-import { changeEmailSchema } from "../validation/changeEmailValidationy";
+import { changeEmailSchema } from "../validation/changeEmailValidation";
 import identityUser_roleClaims from "../lib/models/identityUser_roleClaims";
+import { changePhoneNumebrSchema } from "../validation/changePhoneNumebrValidation";
 
 export async function AddUserAction(prevState: unknown, formData: FormData) {
     // if (!(await hasClaim("add-user"))) {
@@ -37,7 +38,10 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
     const {
         username,
@@ -84,7 +88,7 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
             lockoutEnd: null,
             lockoutEnabled: false,
             accessFailedCount: 0,
-
+            twoFactorMethod: "none",
         });
 
         const userId = newUsers._id.toString();
@@ -135,7 +139,10 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
     });
 
     if (submission.status !== "success") {
-        return submission.reply();
+        return {
+            status: "error",
+            payload: { message: submission.reply() }
+        } as const;
     }
 
     const {
@@ -259,6 +266,7 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
             await identityUser_userClaims.insertMany(docs, { ordered: false });
         }
 
+
         // 6) Update the other user data
         const newConcurrencyStamp = randomUUID();
         const updateData: any = {
@@ -317,7 +325,10 @@ export async function deleteUserAction(prevState: unknown, formData: FormData) {
         schema: deleteSchema(),
     });
     if (subMission.status !== 'success') {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     const { id } = subMission.value;
@@ -374,7 +385,10 @@ export async function resetPasswordAction(prevState: unknown, formData: FormData
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -435,7 +449,10 @@ export async function changePasswordAction(prevState: unknown, formData: FormDat
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -735,11 +752,15 @@ export async function getUserByUsernameForSessionAction(username: string) {
             username: user.username,
             name: user.name,
             email: user.email,
+            phoneNumber: user.phoneNumber,
             avatar: user.avatar,
             securityStamp: user.securityStamp,
             password: user.passwordHash,
             roles: roleNames,          //  String array
             claims: mergedClaims,      // String array without duplicates
+            emailConfirmed: user.emailConfirmed,
+            phoneNumberConfirmed: user.phoneNumberConfirmed,
+            twoFactorEnabled: user.twoFactorEnabled,
         }
     } as const;
 }
@@ -823,7 +844,10 @@ export async function changeNameAction(prevState: unknown, formData: FormData) {
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -898,7 +922,10 @@ export async function changeUserNameAction(prevState: unknown, formData: FormDat
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -973,7 +1000,10 @@ export async function changeEmailAction(prevState: unknown, formData: FormData) 
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -1019,6 +1049,85 @@ export async function changeEmailAction(prevState: unknown, formData: FormData) 
             status: "success",
             payload: {
                 newEmail: newEmail.trim(),
+            },
+        } as const;
+
+
+
+    }
+    catch (error) {
+        return {
+            status: 'error',
+            payload: {
+                message: "",
+            },
+        } as const;
+    }
+}
+
+export async function changePhoneNumberAction(prevState: unknown, formData: FormData) {
+
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
+    const subMission = parseWithZod(formData, {
+        schema: changePhoneNumebrSchema(),
+    });
+
+    if (subMission.status !== "success") {
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
+    }
+
+    try {
+        await dbConnect();
+        const {
+            id,
+            newPhone,
+        } = subMission.value;
+
+        const existingUser = await identityUser_users.findById(id);
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        if (newPhone.trim() !== existingUser.phoneNumber) {
+            const phoneExists = await checkUserExistByPhoneNumberAction(newPhone);
+            if (phoneExists.status === "success") {
+                return {
+                    status: "error",
+                    payload: { message: "Phone already exists." },
+                } as const;
+            }
+            await identityUser_users.findByIdAndUpdate(
+                existingUser._id,
+                {
+                    $set: {
+                        phoneNumber: newPhone.trim(),
+                        phoneNumberConfirmed: false,
+                        securityStamp: randomUUID(),
+                    }
+                },
+            ).exec();
+        }
+
+
+        return {
+            status: "success",
+            payload: {
+                newEmail: newPhone.trim(),
             },
         } as const;
 
@@ -1158,7 +1267,10 @@ export async function LockUnlockUserAction(prevState: unknown, formData: FormDat
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     try {
@@ -1244,7 +1356,10 @@ export async function resetSecurityStampAction(prevState: unknown, formData: For
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
     try {
         await dbConnect();

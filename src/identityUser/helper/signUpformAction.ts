@@ -6,7 +6,6 @@ import { revalidatePath } from "next/cache";
 import { checkUserExistByEmailAction, checkUserExistByUserNameAction } from "./userAction";
 import { hashPassword } from "./sharedFunction";
 import { randomUUID } from "crypto";
-import { redirect } from "next/navigation";
 import identityUser_users from "@/identityuser/lib/models/identityUser_users";
 import identityUser_roles from "@/identityuser/lib/models/identityUser_roles";
 import identityUser_userRoles from "@/identityuser/lib/models/identityUser_userRoles";
@@ -19,7 +18,10 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
         schema: signUpSchema(),
     });
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
     try {
         await dbConnect();

@@ -1,5 +1,5 @@
 "use client"
-import { canUserSignInAction, signInFailedAction, signInFormAction, signInSuccessAction } from "@/identityuser/helper/signInFormAction";
+import { canUserSignInAction, signInFailedAction, signInFormAction, signInSuccessAction } from "@/identityuser/helper/signInAction";
 import { SignInSchema } from "@/identityuser/validation/signInValidation";
 import { useCustomForm } from "@/hooks/useCustomForm";
 import { useEffect, useState } from "react";
@@ -59,7 +59,6 @@ export default function LoginForm() {
                             } else {
                                 signInFailedAction(username);
                                 setSignInError(true);
-
                             }
                         }
                         else {
@@ -73,6 +72,23 @@ export default function LoginForm() {
                 })();
             }
         }
+        else if (lastResult?.status === "success-2fa") {
+            (async () => {
+
+                const { username, password } = lastResult.payload;
+                const logInAllow = await canUserSignInAction(username);
+                if (logInAllow?.status === "success") {
+                    sessionStorage.setItem("pendingPassword", password);
+                    router.push(`/en/signin/twoStep/${username}`);
+                } else {
+                    setRemainingLockoutMinutes(Number(logInAllow?.message))
+                    setIsLockedOut(true);
+                }
+
+            })();
+        }
+
+
     }, [lastResult]);
 
     return (
@@ -136,7 +152,7 @@ export default function LoginForm() {
 
                         </div>
 
-                        {/* <div className="sm:col-span-2 md:col-span-1 w-full">
+                        <div className="sm:col-span-2 md:col-span-1 w-full">
 
                             <Link
                                 href={"./forgetPassword"}
@@ -145,7 +161,7 @@ export default function LoginForm() {
                             >
                                 Forget Password ?
                             </Link>
-                        </div> */}
+                        </div>
 
 
                     </div>

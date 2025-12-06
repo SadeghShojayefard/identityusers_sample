@@ -3,9 +3,9 @@
 import { useCustomForm } from "@/hooks/useCustomForm";
 import { changeNameAction } from "@/identityuser/helper/userAction";
 import { changeNameSchema } from "@/identityuser/validation/changeNameValidation";
-import { hasPayload } from "@/type/actionType.type";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const ChangeName: React.FC<{
     username: string;
@@ -14,7 +14,7 @@ const ChangeName: React.FC<{
     ccs: string;
 }> = ({ username, locale, name, ccs }) => {
 
-
+    const [currentName, setCurrentName] = useState(name);
     const { form, fields, formAction, isPending, toastVisible, lastResult } = useCustomForm({
         action: changeNameAction,
         schema: changeNameSchema(),
@@ -23,6 +23,7 @@ const ChangeName: React.FC<{
     });
 
     const { update } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         if (lastResult?.status === 'success') {
@@ -35,31 +36,35 @@ const ChangeName: React.FC<{
                     }
 
                     const json = await res.json();
+
                     if (json.status === 'success' && json.user) {
                         // Create user object for update 
+                        setCurrentName(json.user.name)
                         const updatedSessionData = {
                             user: {
                                 id: json.user.id,
                                 username: json.user.username,
-                                name: hasPayload(lastResult) ? lastResult.payload.name : json.user.name || null,
+                                name: json.user.name,
                                 email: json.user.email,
+                                phoneNumber: json.user.phoneNumber,
                                 avatar: json.user.avatar,
                                 securityStamp: json.user.securityStamp,
                                 roles: json.user.roles ?? [],
-                                claims: json.user.claims ?? []
+                                claims: json.user.claims ?? [],
+                                emailConfirmed: json.user.emailConfirmed,
+                                phoneNumberConfirmed: json.user.phoneNumberConfirmed,
+                                twoFactorEnabled: json.user.twoFactorEnabled,
                             }
 
                         };
 
                         // call session update 
                         const result = await update(updatedSessionData);
-                        // result may contain a new session or null — check with that
-
                         if (result) {
-                            window.location.reload();
-                        } else {
-                            console.warn("update returned null");
+                            router.refresh();
+                            setTimeout(() => window.location.reload(), 3000);
                         }
+
                     } else {
                         console.error('Session update API responded with error:', json);
                     }
@@ -68,7 +73,7 @@ const ChangeName: React.FC<{
                 }
             })();
         }
-    }, [lastResult, update]);
+    }, [lastResult]);
     return (
 
         <div className="w-full  flex flex-row flex-wrap justify-evenly items-center gap-2  p-2  shadow-xl shadow-black rounded-xl  mt-5 ">
@@ -95,7 +100,7 @@ const ChangeName: React.FC<{
                             <input id="name" type="text" className="input-style text-center"
                                 key={fields.name.key}
                                 name={fields.name.name}
-                                defaultValue={name}
+                                defaultValue={currentName}
                             />
                             {fields.name.errors &&
                                 <p className=' text-md bg-red-300/50 backdrop-blur-2xl  mt-5 p-1 inline-block rounded-2xl'>{fields.name.errors}</p>

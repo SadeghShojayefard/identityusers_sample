@@ -29,7 +29,10 @@ export async function roleAddAction(prevState: unknown, formData: FormData) {
     });
 
     if (subMission.status !== "success") {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
     try {
         await dbConnect();
@@ -90,7 +93,10 @@ export async function roleUpdateAction(prevState: unknown, formData: FormData) {
     });
 
     if (submission.status !== "success") {
-        return submission.reply();
+        return {
+            status: "error",
+            payload: { message: submission.reply() }
+        } as const;
     }
 
     const { id, name, description, concurrencyStamp } = submission.value;
@@ -197,7 +203,10 @@ export async function deleteRoleAction(prevState: unknown, formData: FormData) {
         schema: deleteSchema(),
     });
     if (subMission.status !== 'success') {
-        return subMission.reply();
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
     }
 
     const { id } = subMission.value;

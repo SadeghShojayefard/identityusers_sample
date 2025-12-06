@@ -43,7 +43,7 @@ const EditModal: React.FC<EditModalType> = ({
 
     return (
         <>
-            {toastVisible && <Toast text="اطلاعات با موفقیت به‌روزرسانی شد" />}
+            {toastVisible && <Toast text="data edit successfully" />}
 
 
             <Dialog open={open} onOpenChange={setOpen} >

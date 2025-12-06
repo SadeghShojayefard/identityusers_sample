@@ -1,13 +1,12 @@
 import '@/style/site/signIn/signIn.css'
-import LoginForm from "@/components/site/signIn/LoginForm";
-import SignUpForm from "@/components/site/signIn/SignUpForm";
 import { requireGuest } from '@/identityuser/lib/authGuard';
 import AuthProvider from '@/identityuser/providers/SessionProvider';
 import SessionWatcher from '@/identityuser/components/sessionWatcher/SessionWatcher';
+import ResetPasswordForm from '@/components/site/signIn/ResetPasswordForm';
 
 
-export default async function SignInPage({ params }: { params: Promise<{ locale: string }> }) {
-    const { locale } = await params;
+export default async function resetPasswordPage({ params }: { params: Promise<{ locale: string, token: string }> }) {
+    const { locale, token } = await params;
 
     await requireGuest(`/${locale}`);
 
@@ -16,8 +15,9 @@ export default async function SignInPage({ params }: { params: Promise<{ locale:
     return (
         <>
             <div className="relative w-full h-[calc(100vh-65px)] flex">
-                <SignUpForm />
-                <LoginForm />
+
+                <ResetPasswordForm token={token} />
+
             </div>
         </>
     );

@@ -1,10 +1,12 @@
 
+export default function UserInfo({ username, name, email, phoneNumber }:
+    {
+        username?: string;
+        name?: string;
+        email?: string;
+        phoneNumber?: string;
+    }) {
 
-import { options } from "@/identityuser/api/auth/[...nextauth]/options";
-import { getServerSession } from "next-auth";
-const UserInfo: React.FC = async () => {
-
-    const session = await getServerSession(options);
 
     return (
 
@@ -13,19 +15,23 @@ const UserInfo: React.FC = async () => {
 
             <div className="flex flex-col justify-center items-center gap-1 ">
                 <label className="block text-sm ">Username</label>
-                <input type="text" className="input-style text-center" disabled readOnly defaultValue={session?.user.username} />
+                <input type="text" className="input-style text-center" disabled readOnly defaultValue={username} />
             </div>
             <div className="flex flex-col justify-center items-center gap-1">
                 <label className="block text-sm"> Name</label>
-                <input type="text" className="input-style text-center" disabled readOnly defaultValue={session?.user.name} />
+                <input type="text" className="input-style text-center" disabled readOnly defaultValue={name} />
             </div>
             <div className="flex flex-col justify-center items-center gap-1">
                 <label className="block text-sm"> Email </label>
-                <input type="text" className="input-style text-center" disabled readOnly defaultValue={session?.user.email} />
+                <input type="text" className="input-style text-center" disabled readOnly defaultValue={email} />
+            </div>
+
+            <div className="flex flex-col justify-center items-center gap-1">
+                <label className="block text-sm"> phoneNumber </label>
+                <input type="text" className="input-style text-center" disabled readOnly defaultValue={phoneNumber} />
             </div>
 
         </div>
 
     );
 }
-export default UserInfo;

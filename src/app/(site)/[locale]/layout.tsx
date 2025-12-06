@@ -14,9 +14,8 @@ export default async function Layout({ children, params }: { children: React.Rea
       <body className={`main-bg-color font-vazir`}>
         <AuthProvider>
           <Header locale={locale} />
+          {children}
         </AuthProvider>
-        {children}
-
       </body>
     </html>
   );

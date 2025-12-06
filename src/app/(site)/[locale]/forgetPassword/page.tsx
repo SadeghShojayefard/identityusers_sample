@@ -14,9 +14,7 @@ export default async function ForgetPasswordPage({ params }: { params: Promise<{
 
     return (
         <>
-            <AuthProvider>
-                <SessionWatcher locale={"en"} />
-            </AuthProvider>
+
             <div className="relative w-full h-[calc(100vh-65px)] flex">
 
                 <ForgetForm />

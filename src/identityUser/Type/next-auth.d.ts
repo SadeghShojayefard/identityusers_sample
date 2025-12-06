@@ -8,10 +8,14 @@ declare module "next-auth" {
             username: string;
             name: string;
             email: string;
+            phoneNumber: string;
             avatar: string;
             roles?: string[];
             securityStamp: string;
             claims?: string[];
+            emailConfirmed: boolean;
+            phoneNumberConfirmed: boolean;
+            twoFactorEnabled: boolean;
         };
         expire?: string;
     }
@@ -21,10 +25,14 @@ declare module "next-auth" {
         username: string;
         name: string;
         email: string;
+        phoneNumber: string;
         avatar: string;
         roles?: string[];
         securityStamp: string;
         claims?: string[];
+        emailConfirmed: boolean;
+        phoneNumberConfirmed: boolean;
+        twoFactorEnabled: boolean;
     }
 }
 
@@ -34,10 +42,14 @@ declare module "next-auth/jwt" {
         username: string;
         name: string;
         email: string;
+        phoneNumber: string;
         avatar: string;
         roles?: string[];
         securityStamp: string;
         claims?: string[];
+        emailConfirmed: boolean;
+        phoneNumberConfirmed: boolean;
+        twoFactorEnabled: boolean;
         lastSync?: number;
 
 

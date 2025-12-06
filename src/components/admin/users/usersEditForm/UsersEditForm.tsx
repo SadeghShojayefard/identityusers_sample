@@ -50,7 +50,7 @@ export default function UsersEditForm(
             <div className="form-style w-full">
                 <h2 className="form-title">EDIT USERS</h2>
 
-                {toastVisible && <Toast text={"New User Add Successfully"} />}
+                {toastVisible && <Toast text={"User Edit Successfully"} />}
 
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
 
