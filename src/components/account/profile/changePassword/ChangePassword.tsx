@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import { signOut } from "next-auth/react";
 import { changePasswordAction } from "@/identityuser/helper/userAction";
 import { changePasswordSchema } from "@/identityuser/validation/changePassword";
+import { hasPayload } from "@/type/actionType.type";
 
 const ChangePassword: React.FC<{
     username: string;
-}> = ({ username }) => {
+    passwordExpire: Boolean;
+}> = ({ username, passwordExpire }) => {
 
     const [usernameError, setUsernameError] = useState(false);
     const [oldPasswordError, setOldPasswordError] = useState(false);
@@ -21,7 +23,7 @@ const ChangePassword: React.FC<{
 
     useEffect(() => {
         if (lastResult?.status !== 'success') {
-            const message = lastResult?.payload?.message;
+            const message = hasPayload(lastResult) && lastResult?.payload?.message;
 
             if (message === "userNotExist") {
                 setUsernameError(true);
@@ -52,7 +54,12 @@ const ChangePassword: React.FC<{
                     newPasswordNotMatch */}
             <div className="w-full  flex flex-row flex-wrap justify-evenly items-center gap-2  p-2  shadow-xl shadow-black rounded-xl   ">
 
-                <b className="font-bold text-lg text-black text-shadow-xs text-shadow-black text-start w-full"></b>
+                {
+                    passwordExpire &&
+                    <b className="font-bold text-lg text-black text-shadow-xs text-shadow-black  w-full text-center">
+                        Your Password is expired. please change your password as soon as possible and log in again.
+                    </b>
+                }
 
                 <div className="w-full p-10 flex items-center justify-start text-black z-10 shadow-2xl shadow-black  bg-white/10 rounded-2xl ">
                     <div className="form-style w-full">

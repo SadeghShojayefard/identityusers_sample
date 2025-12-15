@@ -50,6 +50,17 @@ export const ipLimiter = new Ratelimit({
 // Global: 10 requests per 5 minutes
 export const globalLimiter = new Ratelimit({
     redis: redisInstance,
-    limiter: Ratelimit.slidingWindow(10, "5m"),
+    limiter: Ratelimit.slidingWindow(1000, "5m"),
 });
 
+// Username limiter: 5 attempts per 10 minutes
+export const loginUserLimiter = new Ratelimit({
+    redis: redisInstance,
+    limiter: Ratelimit.slidingWindow(5, "10m"),
+});
+
+// IP limiter: 20 attempts per 10 minutes
+export const loginIpLimiter = new Ratelimit({
+    redis: redisInstance,
+    limiter: Ratelimit.slidingWindow(20, "10m"),
+});

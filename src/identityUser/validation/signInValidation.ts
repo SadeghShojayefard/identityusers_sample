@@ -11,6 +11,9 @@ export const SignInSchema = () => {
             .string({ required_error: "Filling in the Password is required." })
             .min(5, { message: "The Password must be at least 8 characters." })
             .max(20, { message: "The Password must be a maximum of 20 characters." }),
-        locale: z.string().optional(),
+        rememberMe: z
+            .string()
+            .optional()
+            .transform(val => val === "on"),
     });
 };

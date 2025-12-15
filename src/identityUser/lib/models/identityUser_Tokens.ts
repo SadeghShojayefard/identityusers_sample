@@ -16,7 +16,7 @@ const TokensSchema = new Schema(
         },
         type: { // Used Email or Phone for Forget Password
             type: String,
-            enum: ["email", "phone", "email-verify", "phone-verify"],
+            enum: ["email", "phone", "email-verify", "phone-verify", "login-otp", "fallback-login"],
             required: true,
         },
         hashedToken: {
@@ -37,5 +37,5 @@ const TokensSchema = new Schema(
     { timestamps: true }
 );
 
-export default mongoose.models.identityUser_passwordResetToken ||
+export default mongoose.models.identityUser_Tokens ||
     mongoose.model("identityUser_Tokens", TokensSchema);

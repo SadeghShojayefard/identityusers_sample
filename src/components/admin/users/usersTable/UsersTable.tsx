@@ -11,7 +11,7 @@ import Image from "next/image";
 import EditModal from "../../modals/editModal/EditModal";
 import EditModalInput from "../../modals/editModalInput/EditModalInput";
 import { useEffect, useState } from "react";
-import { changePasswordAction, deleteUserAction, getAllUsersAction, LockUnlockUserAction, resetPasswordAction, resetSecurityStampAction } from "@/identityuser/helper/userAction";
+import { changePasswordAction, deleteUserAction, disable2FAdAction, getAllUsersAction, LockUnlockUserAction, resetPasswordAction, resetSecurityStampAction } from "@/identityuser/helper/userAction";
 import DetailModal from "../../modals/detailModal/DetailModal";
 import DeleteModal from "../../modals/deleteModal/DeleteModal";
 import { ChangePasswordUserShema } from "@/identityuser/validation/ChangePasswordUserValidation";
@@ -334,6 +334,43 @@ export default function UsersTable({ editClaim, deleteClaim, detailsClaim, passw
                                                 </>
                                             )}
                                         </EditModal>
+                                    }
+
+                                    {
+                                        //Disable user 2FA
+                                        item.twoFactorEnabled ?
+                                            (<EditModal
+                                                title={"Disable User 2FA"}
+                                                text={`Are you sure you want to disable 2FA of user ${item.username} `}
+                                                isUpdate={handlePageChange}
+                                                buttonText={"Disable 2FA"}
+                                                action={disable2FAdAction}
+                                                schema={deleteSchema()}
+                                            >
+                                                {(fields) => (
+                                                    <>
+
+                                                        <EditModalInput
+                                                            inputType="hidden"
+                                                            onUpdateInputs={handleUpdateInputs}
+                                                            value={item.id}
+                                                            placeholder=""
+                                                            id="id"
+                                                            fieldKey="id"
+                                                            fields={fields}
+                                                        />
+                                                    </>
+                                                )}
+                                            </EditModal>)
+                                            :
+                                            (
+                                                <p
+                                                    className="bg-sky-500 backdrop-blur-2xl text-white p-2 rounded-2xl  shadow-xl
+                                                     shadow-sky-800 hover:hover:bg-sky-600   text-wrap font-bold px-3"
+                                                >
+                                                    No 2FA
+                                                </p>
+                                            )
                                     }
 
                                 </TableCell>

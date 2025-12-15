@@ -12,20 +12,26 @@ export default async function AccountLayout({ children, params }: { children: Re
 
 
     const session = await requireAuth(`/${locale}`);
+
+
+
     return (
         <>
             <AuthProvider>
                 <SessionWatcher locale={locale} />
-                <div className="flex flex-row justify-start items-center  my-20  rounded-2xl 
+                <div className="flex flex-col sm:flex-row md:flex-row justify-start items-center  my-20  rounded-2xl 
         shadow-2xl shadow-black bg-white/30 backdrop-blur-md  ">
                     <div className="grid grid-cols-10 w-full  rounded-2xl gap-2 ">
                         {session === null ? (null) :
                             (
                                 <>
-                                    <AccountSidebar locale={locale}
-                                        avatar={session.user.avatar} username={session.user.username} roles={session.user.roles} />
+                                    <AccountSidebar
+                                        locale={locale} avatar={session.user.avatar}
+                                        username={session.user.username} roles={session.user.roles}
+                                        passwordExpire={session.user.passwordExpire}
+                                    />
 
-                                    <div className="sm:col-span-10 md:col-span-9   flex flex-col justify-start items-center   w-full rounded-2xl p-2">
+                                    <div className="col-span-10 md:col-span-9   flex flex-col justify-start items-center   w-full rounded-2xl p-2">
                                         {children}
 
                                     </div>

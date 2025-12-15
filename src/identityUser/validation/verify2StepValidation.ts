@@ -7,6 +7,14 @@ export const verify2StepSchema = () => {
             .string(),
         token: z
             .string(),
+        remember: z
+            .string()
+            .optional()
+            .transform(val => val === "on"),
+        emailOrOTP: z
+            .string()
+            .optional()
+            .transform(val => val === "on"),
     })
 };
 

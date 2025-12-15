@@ -5,6 +5,7 @@ import '@/style/site/signIn/signIn.css'
 import SessionWatcher from "@/identityuser/components/sessionWatcher/SessionWatcher";
 import AuthProvider from "@/identityuser/providers/SessionProvider";
 import { requireAuth } from "@/identityuser/lib/authGuard";
+import { redirect } from "next/navigation";
 
 
 
@@ -20,6 +21,10 @@ export default async function AdminLayout({
 }>) {
 
     const session = await requireAuth(`/en`);
+
+    if (session.user.passwordExpire) {
+        redirect("/en");
+    }
 
     return (
         <html lang="en">

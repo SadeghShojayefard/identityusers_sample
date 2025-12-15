@@ -4,7 +4,7 @@ import { SubmissionResult } from "@conform-to/react";
 export type ActionResult =
     | SubmissionResult<string[]>
     | {
-        status: "success" | "error" | "success-2fa";
+        status: "success" | "error" | "success-2fa" | "password-expired";
         payload?: any;
     }
     | undefined;

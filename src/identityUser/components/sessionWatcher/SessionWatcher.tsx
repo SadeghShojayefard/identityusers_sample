@@ -33,5 +33,45 @@ export default function SessionWatcher({ locale }: { locale: string }) {
         return () => window.removeEventListener("storage", handler);
     }, [locale]);
 
+
+    useEffect(() => {
+        if (!session?.user) return;
+
+        const { rememberMe, loginAt } = session.user;
+
+
+        // If rememberMe not checked session expire after 1 hour and user force to log out 
+        if (!rememberMe) {
+
+            const ONE_HOUR = 60 * 60 * 1000; // (adjust if needed)
+
+            const check = () => {
+                const now = Date.now();
+
+                if (now - Number(loginAt) > ONE_HOUR) {
+                    // خروج از تمام تب‌ها
+                    localStorage.setItem("logout", Date.now().toString());
+
+                    signOut({
+                        callbackUrl: `/${locale}`,
+                    });
+                }
+            };
+
+            // اجرای اولیه
+            check();
+
+            // هر 30 ثانیه چک می‌کند
+            const interval = setInterval(check, 30_000);
+
+            return () => clearInterval(interval);
+        }
+    }, [session, locale]);
+
+
+
+
+
+
     return null;
 }

@@ -16,8 +16,16 @@ declare module "next-auth" {
             emailConfirmed: boolean;
             phoneNumberConfirmed: boolean;
             twoFactorEnabled: boolean;
+<<<<<<< HEAD
+            rememberMe: boolean;
+            loginAt: Date;
+            passwordExpire: Boolean;
+        };
+        expires: string;
+=======
         };
         expire?: string;
+>>>>>>> be9c483b74454327489f9e0de268e1c6b4423d09
     }
 
     interface User {
@@ -33,6 +41,8 @@ declare module "next-auth" {
         emailConfirmed: boolean;
         phoneNumberConfirmed: boolean;
         twoFactorEnabled: boolean;
+        rememberMe: boolean;
+        passwordExpire: Boolean;
     }
 }
 
@@ -50,8 +60,8 @@ declare module "next-auth/jwt" {
         emailConfirmed: boolean;
         phoneNumberConfirmed: boolean;
         twoFactorEnabled: boolean;
+        rememberMe: boolean;
+        passwordExpire: Boolean;
         lastSync?: number;
-
-
     }
 }

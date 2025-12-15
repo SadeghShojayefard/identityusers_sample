@@ -1,19 +1,23 @@
 "use client"
-import { signInFailedAction, signInSuccessAction, verifyLogin2FAAction, verifyRecoveryCodeAction } from "@/identityuser/helper/signInAction";
+import { signInFailedAction, signInSuccessAction, verifyRecoveryCodeFormAction } from "@/identityuser/helper/signInAction";
 import { useCustomForm } from "@/hooks/useCustomForm";
 import { useEffect, useState } from "react";
 import { hasPayload } from "@/type/actionType.type";
 import { verify2StepSchema } from "@/identityuser/validation/verify2StepValidation";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 
 export default function RecoveryCodeForm({ username }: { username: string }) {
 
+
     const [error, setError] = useState("");
     const [showError, setShowError] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
 
     const { form, fields, formAction, isPending, toastVisible, lastResult } = useCustomForm({
-        action: verifyRecoveryCodeAction,
+        action: verifyRecoveryCodeFormAction,
         schema: verify2StepSchema(),
         showToast: true,
         id: "Recovery2FA"
@@ -21,28 +25,24 @@ export default function RecoveryCodeForm({ username }: { username: string }) {
     const router = useRouter();
 
     useEffect(() => {
-        const password = sessionStorage.getItem("pendingPassword");
 
-        if (!password) {
-            setShowError(true);
-            setError("Session expired, please login again.");
-            router.push(`/en/signin`);
-            return;
-        }
 
         if (lastResult?.status === "success" && hasPayload(lastResult)) {
-            const { username } = lastResult.payload;
+            const { username, token, remember } = lastResult.payload;
             (async () => {
-                const res = await signIn("credentials", {
+                const res = await signIn("Credentials_Recovery_Code", {
                     username,
-                    password,
+                    token,
+                    rememberMe: remember,
                     redirect: false,
                     callbackUrl: `/en/account/profile/${username}`
                 });
                 if (res?.ok) {
-                    sessionStorage.removeItem("pendingPassword");
                     setShowError(false);
                     setError("");
+                    setSuccessMessage("verify Pass");
+                    setShowSuccessMessage(true);
+
                     signInSuccessAction(username);
                     try {
                         const bc = new BroadcastChannel("auth");
@@ -55,8 +55,10 @@ export default function RecoveryCodeForm({ username }: { username: string }) {
                     router.push(`/en/account/profile/${username}`);
 
 
-                } else {
+                } else if (res?.error) {
                     signInFailedAction(username);
+                    setShowError(true);
+                    setError(res.error);
                 }
 
             })();
@@ -73,12 +75,16 @@ export default function RecoveryCodeForm({ username }: { username: string }) {
             <div className="form-style w-full md:w-1/3  shadow-2xl shadow-black p-3 rounded-2xl border-sky-200 border-2">
                 <h3 className="form-title">Recovery form  </h3>
 
-                {toastVisible && (
-                    <p className=" bg-sky-500 backdrop-blur-2xl text-white px-5 py-2  rounded-lg mt-2
+                {toastVisible && showSuccessMessage === true &&
+                    (
+                        <p className=" bg-sky-500 backdrop-blur-2xl text-white px-5 py-2  rounded-lg mt-2
                              transition-all duration-300 ease-in-out transform shadow-xl shaodw-black text-center">
-                        {hasPayload(lastResult) && lastResult.payload.message}
-                    </p>
-                )}
+                            {successMessage}
+                        </p>
+                    )
+
+                }
+
 
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
                     <input id="username" type="hidden" className="input-style text-center" defaultValue={username}
@@ -104,6 +110,14 @@ export default function RecoveryCodeForm({ username }: { username: string }) {
                             {hasPayload(lastResult) && lastResult.payload.message}
                         </p>
                     )}
+                    {showError && (
+                        <p className=" bg-sky-500 backdrop-blur-2xl text-white px-5 py-2  rounded-lg mt-2
+                             transition-all duration-300 ease-in-out transform shadow-xl shaodw-black text-center">
+                            {error}
+                        </p>
+                    )}
+
+
 
                     <div className="w-full flex flex-row justify-center items-center ">
                         <button className="w-1/2  bg-sky-500 backdrop-blur-2xl text-white p-2 mt-4 rounded-2xl cursor-pointer

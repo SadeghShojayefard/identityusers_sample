@@ -5,36 +5,44 @@ import ChangeName from "@/components/account/profile/changeName/ChangeName";
 import { requireAuth } from "@/identityuser/lib/authGuard";
 import { getCurrentCCSAction } from "@/identityuser/helper/userAction";
 import Varification from "@/components/account/profile/varification/Varification";
-import { getServerSession } from "next-auth";
-import { options } from "@/identityuser/api/auth/[...nextauth]/options";
+
 
 export default async function AccountProfilePage({ params }: { params: Promise<{ locale: string }> }) {
     const { locale } = await params;
 
     const session = await requireAuth(`/${locale}`);
     const ccsDate = await getCurrentCCSAction(session?.user.username!);
-    const sessionData = await getServerSession(options);
     return (
-        <div className="w-full  flex flex-col justify-start items-center gap-2  text-start  pb-5  ">
-            <b className="font-extrabold text-2xl text-black text-shadow-xs text-shadow-black text-start w-full border-b">Profile</b>
-            <UserInfo username={sessionData?.user.username} name={sessionData?.user.name} email={sessionData?.user.email} phoneNumber={sessionData?.user.phoneNumber} />
-            <Varification
-                id={sessionData?.user.id}
-                email={sessionData?.user.email}
-                phoneNumber={sessionData?.user.phoneNumber}
-                emailConfirmed={sessionData?.user.emailConfirmed}
-                phoneNumberConfirmed={sessionData?.user.phoneNumberConfirmed}
-                twoFactorEnabled={sessionData?.user.twoFactorEnabled}
-            />
-            <ChangeName
-                username={session?.user.username!}
-                name={session?.user.name!}
-                locale={locale}
-                ccs={ccsDate.data.ccs}
-            />
 
+        <div className="w-full  flex flex-col justify-start items-center gap-2  text-start  pb-5  ">
+            {
+                !session.user.passwordExpire &&
+                (
+                    <>
+
+                        <UserInfo username={session.user.username} name={session.user.name} email={session.user.email} phoneNumber={session.user.phoneNumber} />
+                        <Varification
+                            id={session.user.id}
+                            email={session.user.email}
+                            phoneNumber={session.user.phoneNumber}
+                            emailConfirmed={session.user.emailConfirmed}
+                            phoneNumberConfirmed={session.user.phoneNumberConfirmed}
+                            twoFactorEnabled={session.user.twoFactorEnabled}
+                        />
+                        <ChangeName
+                            username={session?.user.username!}
+                            name={session?.user.name!}
+                            locale={locale}
+                            ccs={ccsDate.data.ccs}
+                        />
+                    </>
+                )
+
+            }
+            <b className="font-extrabold text-2xl text-black text-shadow-xs text-shadow-black text-start w-full border-b">Password is expire</b>
             <ChangePassword
                 username={session?.user.username!}
+                passwordExpire={session.user.passwordExpire}
             />
         </div>
 

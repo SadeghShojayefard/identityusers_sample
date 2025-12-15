@@ -4,6 +4,7 @@ import { options } from '@/identityuser/api/auth/[...nextauth]/options';
 import { NextResponse } from 'next/server';
 import dbConnect from '@/identityuser/lib/db';
 import { getUserByUsernameForSessionAction } from '@/identityuser/helper/userAction';
+import { hasPayload } from '@/type/actionType.type';
 
 export async function GET() {
     try {
@@ -19,6 +20,9 @@ export async function GET() {
         if (!user) {
             return NextResponse.json({ status: 'notFound' }, { status: 404 });
         }
+
+        if (!hasPayload(user) || user.status === "error") { return null }
+
         const userPayload = user.payload;
 
         return NextResponse.json({

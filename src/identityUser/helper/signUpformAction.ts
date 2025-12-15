@@ -4,7 +4,7 @@ import { signUpSchema } from "@/identityuser/validation/signUpValidation";
 import { parseWithZod } from "@conform-to/zod";
 import { revalidatePath } from "next/cache";
 import { checkUserExistByEmailAction, checkUserExistByUserNameAction } from "./userAction";
-import { hashPassword } from "./sharedFunction";
+import { hashPassword, savePasswordToHistory } from "./sharedFunction";
 import { randomUUID } from "crypto";
 import identityUser_users from "@/identityuser/lib/models/identityUser_users";
 import identityUser_roles from "@/identityuser/lib/models/identityUser_roles";
@@ -72,6 +72,7 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
             normalizedEmail: email.toUpperCase(),
             emailConfirmed: false,
             passwordHash: encryptPassword,
+            passwordLastChanged: new Date(),
             securityStamp: randomUUID(),
             concurrencyStamp: randomUUID(),
             phoneNumberConfirmed: false,
@@ -90,6 +91,8 @@ export async function signUpformAction(prevState: unknown, formData: FormData) {
             role: role._id,
             user: userId,
         })
+
+        savePasswordToHistory(userId, encryptPassword);
 
         revalidatePath('/cmsUsers');
         return {

@@ -2,7 +2,7 @@
 import { parseWithZod } from "@conform-to/zod";
 import { revalidatePath } from "next/cache";
 import dbConnect from "@/identityuser/lib/db";
-import { comparePassword, hashPassword } from "./sharedFunction";
+import { checkOldPassword, comparePassword, hashPassword, savePasswordToHistory } from "./sharedFunction";
 
 import identityUser_users from "@/identityuser/lib/models/identityUser_users";
 import identityUser_userClaims from "@/identityuser/lib/models/identityUser_userClaims"
@@ -23,6 +23,8 @@ import { changeUserNameSchema } from "../validation/changeUserNameValidation";
 import { changeEmailSchema } from "../validation/changeEmailValidation";
 import identityUser_roleClaims from "../lib/models/identityUser_roleClaims";
 import { changePhoneNumebrSchema } from "../validation/changePhoneNumebrValidation";
+import { cookies } from "next/headers";
+import identityUser_passwordHistory from "../lib/models/identityUser_passwordHistory";
 
 export async function AddUserAction(prevState: unknown, formData: FormData) {
     // if (!(await hasClaim("add-user"))) {
@@ -80,6 +82,7 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
             normalizedEmail: email.toUpperCase(),
             emailConfirmed: false,
             passwordHash: encryptPassword,
+            passwordLastChanged: new Date(),
             securityStamp: randomUUID(),
             concurrencyStamp: randomUUID(),
             phoneNumber: "",
@@ -92,6 +95,10 @@ export async function AddUserAction(prevState: unknown, formData: FormData) {
         });
 
         const userId = newUsers._id.toString();
+
+        savePasswordToHistory(userId, encryptPassword);
+
+
 
         if (selectedClaims.length > 0) {
             const userClaimsDocs = selectedClaims.map((claimId) => ({
@@ -205,15 +212,17 @@ export async function UserUpdateAction(prevState: unknown, formData: FormData) {
         }
 
         /// user this if only you want have uniq phoneNumber
-        // if (phoneNumber !== existingUser.phoneNumber) {
-        //     const emailExists = await checkUserExistByPhoneNumberAction(phoneNumber);
-        //     if (emailExists.status === "success") {
-        //         return {
-        //             status: "error",
-        //             payload: { message: "Email already exists." },
-        //         } as const;
-        //     }
-        // }
+        if (phoneNumber) {
+            if (phoneNumber !== existingUser.phoneNumber) {
+                const emailExists = await checkUserExistByPhoneNumberAction(phoneNumber);
+                if (emailExists.status === "success") {
+                    return {
+                        status: "error",
+                        payload: { message: "Email already exists." },
+                    } as const;
+                }
+            }
+        }
 
         //  Auxiliary variable for detecting important changes
         let sensitiveChanged = false;
@@ -393,29 +402,56 @@ export async function resetPasswordAction(prevState: unknown, formData: FormData
 
     try {
         await dbConnect();
+
         const {
             id,
             password,
         } = subMission.value;
+
         const existingUser = await identityUser_users.findOne({ _id: id });
         if (!existingUser) {
             return {
                 status: 'error',
                 payload: {
-                    message: "userNotExist",
+                    message: "user Not Exist",
                 },
             } as const;
         }
+
+        ////////// check old password
+        const oldPasswordresult = await checkOldPassword(id, password);
+        if (!oldPasswordresult) {
+            return {
+                status: "error",
+                payload: {
+                    message: 'You cannot reuse an old password.'
+                },
+            } as const;
+        }
+
+        /// save new password
         const encryptPassword = await hashPassword(password);
         await identityUser_users.findByIdAndUpdate(
             existingUser._id,
             {
                 $set: {
                     passwordHash: encryptPassword,
+                    passwordLastChanged: new Date(),
                     securityStamp: randomUUID(),
                 }
             },
         ).exec();
+
+        //save password in history table
+        await savePasswordToHistory(id, encryptPassword);
+
+
+        return {
+            status: "success",
+            payload: {
+                message: "",
+            },
+        } as const;
 
         return {
             status: "success",
@@ -436,14 +472,14 @@ export async function resetPasswordAction(prevState: unknown, formData: FormData
 }
 
 export async function changePasswordAction(prevState: unknown, formData: FormData) {
-    if (!(await hasAnyClaim())) {
-        return {
-            status: 'error',
-            payload: {
-                message: 'no access for this action',
-            },
-        } as const;
-    }
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
     const subMission = parseWithZod(formData, {
         schema: changePasswordSchema(),
     });
@@ -492,22 +528,109 @@ export async function changePasswordAction(prevState: unknown, formData: FormDat
             } as const;
         }
 
-        const encryptPassword = await hashPassword(newPassword);
+        ////////// check old password
 
+        const oldPasswordresult = await checkOldPassword(existingUser._id, newPassword);
+        if (!oldPasswordresult) {
+            return {
+                status: "error",
+                payload: {
+                    message: 'You cannot reuse an old password.'
+                },
+            } as const;
+        }
+
+
+
+        const encryptPassword = await hashPassword(newPassword);
+        //change password
         await identityUser_users.findByIdAndUpdate(
             existingUser._id,
             {
                 $set: {
                     passwordHash: encryptPassword,
+                    passwordLastChanged: new Date(),
                     securityStamp: randomUUID(),
+                    concurrencyStamp: randomUUID(),
+
                 }
             },
         ).exec();
+
+        //save password in history table
+        await savePasswordToHistory(existingUser._id, encryptPassword);
 
         return {
             status: "success",
             payload: {
                 message: "",
+            },
+        } as const;
+    }
+    catch (error) {
+        console.error('Error saving contact form:', error);
+        return {
+            status: 'error',
+            payload: {
+                message: '',
+            },
+        } as const;
+    }
+}
+
+export async function disable2FAdAction(prevState: unknown, formData: FormData) {
+    // if (!(await hasAnyClaim())) {
+    //     return {
+    //         status: 'error',
+    //         payload: {
+    //             message: 'no access for this action',
+    //         },
+    //     } as const;
+    // }
+    const subMission = parseWithZod(formData, {
+        schema: deleteSchema(),
+    });
+
+    if (subMission.status !== "success") {
+        return {
+            status: "error",
+            payload: { message: subMission.reply() }
+        } as const;
+    }
+
+    try {
+        const { id } = subMission.value;
+
+
+        await dbConnect();
+        const existingUser = await identityUser_users.findById(id);
+        if (!existingUser) {
+            return {
+                status: 'error',
+                payload: {
+                    message: "userNotExist",
+                },
+            } as const;
+        }
+
+        await identityUser_users.findByIdAndUpdate(
+            existingUser._id,
+            {
+                $set: {
+                    securityStamp: randomUUID(),
+                    twoFactorEnabled: false,
+                    twoFactorSecret: undefined,
+                    recoveryCodes: [],
+                }
+            },
+        ).exec();
+        const cookieStore = cookies();
+        (await cookieStore).delete("identity_2fa_browser");
+
+        return {
+            status: "success",
+            payload: {
+                message: `user ${existingUser.username} 2FA is Disable now.`,
             },
         } as const;
     }
@@ -698,11 +821,37 @@ export async function getUserByUsernameForSessionAction(username: string) {
     // 1) Find User by Username
     const user = await identityUser_users.findOne({ username });
     if (!user) {
-        return { status: "error", message: "User not found" };
+        return {
+            status: "error",
+            payload: {
+                message: "User not found"
+            }
+        } as const;
     }
 
-    const userId = user._id.toString();
+    return sessionData(user);
+}
+export async function getUserByPhoneForSessionAction(phone: string) {
+    await dbConnect();
 
+    // 1) Find User by phoneNumber
+    const user = await identityUser_users.findOne({ phoneNumber: phone });
+    if (!user) {
+        return {
+            status: "error",
+            payload: {
+                message: "User not found"
+            }
+        } as const;
+    }
+
+    return sessionData(user);
+
+}
+
+async function sessionData(user: any) {
+
+    const userId = user._id.toString();
     // 2) Find User Roles
     const userRoles = await identityUser_userRoles.find({ user: userId })
         .populate({
@@ -756,6 +905,7 @@ export async function getUserByUsernameForSessionAction(username: string) {
             avatar: user.avatar,
             securityStamp: user.securityStamp,
             password: user.passwordHash,
+            passwordLastChanged: user.passwordLastChanged,
             roles: roleNames,          //  String array
             claims: mergedClaims,      // String array without duplicates
             emailConfirmed: user.emailConfirmed,
@@ -764,6 +914,7 @@ export async function getUserByUsernameForSessionAction(username: string) {
         }
     } as const;
 }
+
 
 export async function getUserByPhoneNumberAction(phoneNumber: string) {
     await dbConnect();

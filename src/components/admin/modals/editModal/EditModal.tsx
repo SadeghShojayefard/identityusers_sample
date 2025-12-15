@@ -15,6 +15,7 @@ import React, { useEffect, useState } from "react";
 import { EditModalType } from "@/type/EditModalType.type";
 import { useCustomForm } from "@/hooks/useCustomForm";
 import Toast from "@/components/share/toast/Toast";
+import { hasPayload } from "@/type/actionType.type";
 
 const EditModal: React.FC<EditModalType> = ({
     title,
@@ -27,7 +28,7 @@ const EditModal: React.FC<EditModalType> = ({
 }) => {
     const [open, setOpen] = useState(false);
 
-    const { form, fields, formAction, isPending, toastVisible } = useCustomForm({
+    const { form, fields, formAction, isPending, toastVisible, lastResult } = useCustomForm({
         action,
         schema,
         showToast: true,
@@ -58,7 +59,14 @@ const EditModal: React.FC<EditModalType> = ({
                     </DialogHeader>
                     <form className="flex flex-col w-full mt-5" id={form.id} action={formAction} onSubmit={form.onSubmit}>
                         {children(fields)}
+                        {
+                            lastResult?.status === "error" && hasPayload(lastResult) &&
+                            <p className="text-red-500 font-semibold">
+                                {lastResult.payload.message}
+                            </p>
+                        }
                         <DialogFooter className="mt-10 flex flex-row justify-center items-center gap-2 w-full">
+
                             <Button type="submit" className="formButton" disabled={isPending}>
                                 {isPending ? "Sending..." : "Edit"}
                             </Button>

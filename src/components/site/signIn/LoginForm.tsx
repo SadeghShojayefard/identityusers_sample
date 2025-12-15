@@ -15,7 +15,8 @@ export default function LoginForm() {
     const [signInError, setSignInError] = useState(false);
     const [isLockedOut, setIsLockedOut] = useState(false);
     const [remainingLockoutMinutes, setRemainingLockoutMinutes] = useState(0);
-
+    const [errorMessage, setErrorMessage] = useState("");
+    const [retryAfterMs, setRetryAfterMs] = useState("");
     const router = useRouter();
     const { form, fields, formAction, isPending, lastResult } = useCustomForm({
         action: signInFormAction,
@@ -27,9 +28,7 @@ export default function LoginForm() {
     useEffect(() => {
         if (lastResult?.status === 'success') {
             if (hasPayload(lastResult)) {
-
-                const { username, password } = lastResult.payload;
-
+                const { username, password, rememberMe } = lastResult.payload;
                 (async () => {
                     try {
                         const logInAllow = await canUserSignInAction(username);
@@ -38,6 +37,7 @@ export default function LoginForm() {
                             const res = await signIn("credentials", {
                                 username,
                                 password,
+                                rememberMe,
                                 redirect: false,
                                 callbackUrl: `/en/account/profile/${username}`,
 
@@ -45,7 +45,7 @@ export default function LoginForm() {
 
                             if (res?.ok) {
                                 setSignInError(false);
-                                signInSuccessAction(username);
+                                await signInSuccessAction(username);
                                 try {
                                     const bc = new BroadcastChannel("auth");
                                     bc.postMessage({ type: "login", username, avatar: "/Avatar/Default Avatar.png" });
@@ -57,8 +57,9 @@ export default function LoginForm() {
                                 router.push(res.url || `/en/account/profile/${username}`);
 
                             } else {
-                                signInFailedAction(username);
+                                await signInFailedAction(username);
                                 setSignInError(true);
+                                setErrorMessage(lastResult?.payload.message);
                             }
                         }
                         else {
@@ -68,6 +69,7 @@ export default function LoginForm() {
 
                     } catch (error) {
                         setSignInError(true);
+                        setErrorMessage("Something wrong please try later");
                     }
                 })();
             }
@@ -75,11 +77,10 @@ export default function LoginForm() {
         else if (lastResult?.status === "success-2fa") {
             (async () => {
 
-                const { username, password } = lastResult.payload;
+                const { username, rememberMe } = lastResult.payload;
                 const logInAllow = await canUserSignInAction(username);
                 if (logInAllow?.status === "success") {
-                    sessionStorage.setItem("pendingPassword", password);
-                    router.push(`/en/signin/twoStep/${username}`);
+                    router.push(`/en/signin/twoStep/${username}?rememberMe=${rememberMe}`);
                 } else {
                     setRemainingLockoutMinutes(Number(logInAllow?.message))
                     setIsLockedOut(true);
@@ -87,12 +88,24 @@ export default function LoginForm() {
 
             })();
         }
-
+        else if (lastResult?.status === "password-expired") {
+            const { message, redirectTo } = lastResult.payload;
+            setSignInError(true);
+            setErrorMessage(message);
+            router.push(redirectTo);
+        }
+        else {
+            if (hasPayload(lastResult)) {
+                setSignInError(true);
+                lastResult.payload?.message && setErrorMessage(lastResult.payload?.message);
+                lastResult.payload?.retryAfterMs && setRetryAfterMs(lastResult.payload?.retryAfterMs);
+            }
+        }
 
     }, [lastResult]);
 
     return (
-        <div className="formBody bg-white/30 w-1/2 ">
+        <div className=" bg-white/30 w-full h-full p-10 ">
             <div className="form-style w-full">
                 <h2 className="form-title">Sign In</h2>
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
@@ -124,6 +137,13 @@ export default function LoginForm() {
                         }
 
                     </div>
+                    <div className="flex flex-row items-center justify-start gap-5">
+                        <label htmlFor="rememberMe" className="block text-sm">rememberMe:</label>
+                        <input id="rememberMe" type="checkbox"
+                            key={fields.rememberMe.key}
+                            name={fields.rememberMe.name}
+                        />
+                    </div>
                     {isLockedOut && (
                         <p className="text-md bg-red-300/50 backdrop-blur-2xl mt-5 p-1 inline-block rounded-2xl">
                             {"You can not Login Now"} |
@@ -133,10 +153,20 @@ export default function LoginForm() {
                     )}
 
                     {signInError && (
+                        <>
+                            <p className="text-md bg-red-300/50 backdrop-blur-2xl mt-5 p-1 inline-block rounded-2xl">
+                                {errorMessage}
+                            </p>
+
+                        </>
+                    )}
+                    {retryAfterMs && (
                         <p className="text-md bg-red-300/50 backdrop-blur-2xl mt-5 p-1 inline-block rounded-2xl">
-                            {"Username or Passwrod is wrong."}
+                            Try again after {Math.ceil(Number(retryAfterMs) / 1000)} seconds
                         </p>
                     )}
+
+
                     <div className="grid  grid-cols-2  flex-wrap justify-center items-center gap-2 w-full ">
 
                         <div className="sm:col-span-2 md:col-span-1 w-full">

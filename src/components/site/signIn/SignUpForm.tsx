@@ -43,7 +43,7 @@ export default function SignUpForm() {
 
 
     return (
-        <div className="formBody  bg-white/10 w-1/2">
+        <div className="formBody  bg-white/10 w-full ">
             <div className="form-style w-full">
                 <h2 className="form-title">Sign Up</h2>
                 <form className="form-group" id={form.id} onSubmit={form.onSubmit} action={formAction}>
