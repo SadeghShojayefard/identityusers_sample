@@ -11,6 +11,6 @@ export type ActionResult =
 
 export function hasPayload(
     result: ActionResult
-): result is { status: "success" | "error"; payload?: any } {
+): result is { status: "success" | "error" | "success-2fa" | "password-expired"; payload?: any } {
     return !!result && "payload" in result;
 }

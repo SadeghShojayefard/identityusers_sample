@@ -50,31 +50,31 @@ export async function signInFormAction(prevState: unknown, formData: FormData) {
         const password = subMission.value.password;
         const rememberMe = subMission.value.rememberMe;
 
-        const userKey = `login:user:${username}`;
-        const ipKey = `login:ip:${ip}`;
+        // const userKey = `login:user:${username}`;
+        // const ipKey = `login:ip:${ip}`;
 
-        const userLimit = await loginUserLimiter.limit(userKey);
-        const ipLimit = await loginIpLimiter.limit(ipKey);
+        // const userLimit = await loginUserLimiter.limit(userKey);
+        // const ipLimit = await loginIpLimiter.limit(ipKey);
 
-        if (!userLimit.success || !ipLimit.success) {
-            // Block login attempt temporarily
-            const userRetryMs = userLimit.success
-                ? 0
-                : Math.max(0, userLimit.reset - Date.now());
+        // if (!userLimit.success || !ipLimit.success) {
+        //     // Block login attempt temporarily
+        //     const userRetryMs = userLimit.success
+        //         ? 0
+        //         : Math.max(0, userLimit.reset - Date.now());
 
-            const ipRetryMs = ipLimit.success
-                ? 0
-                : Math.max(0, ipLimit.reset - Date.now());
+        //     const ipRetryMs = ipLimit.success
+        //         ? 0
+        //         : Math.max(0, ipLimit.reset - Date.now());
 
-            const retryAfterMs = Math.max(userRetryMs, ipRetryMs);
-            return {
-                status: "error",
-                payload: {
-                    message: "Too many login attempts. Please try again later.",
-                    retryAfterMs
-                },
-            } as const;
-        }
+        //     const retryAfterMs = Math.max(userRetryMs, ipRetryMs);
+        //     return {
+        //         status: "error",
+        //         payload: {
+        //             message: "Too many login attempts. Please try again later.",
+        //             retryAfterMs
+        //         },
+        //     } as const;
+        // }
 
         await dbConnect();
         // 1)Check if username exist or not
